@@ -21,8 +21,8 @@ export class CheckboxButtonComponent {
   /** Get host classes by `focused` and `checked` status */
   @HostBinding('class')
   get hostClasses(): object {
-    if (this.checked && this.focused) {
-      // When checked and focused.
+    if (this.focused || (this.checked && this.focused)) {
+      // When focused, or checked and focused.
       return {
         'border-primary-500': true,
         'bg-primary-100': true,
