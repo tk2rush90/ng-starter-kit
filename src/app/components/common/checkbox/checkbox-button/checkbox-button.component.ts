@@ -21,7 +21,12 @@ export class CheckboxButtonComponent {
   /** Get host classes by `focused` and `checked` status */
   @HostBinding('class')
   get hostClasses(): object {
-    if (this.focused || (this.checked && this.focused)) {
+    if (this.disabled) {
+      return {
+        'bg-zinc-50': true,
+        'border-zinc-300': true,
+      };
+    } else if (this.focused || (this.checked && this.focused)) {
       // When focused, or checked and focused.
       return {
         'border-primary-500': true,
@@ -36,7 +41,8 @@ export class CheckboxButtonComponent {
 
   /** Get classes for selected indicator by `focused` status */
   get indicatorClasses(): object {
-    if (this._checkboxService.focused) {
+    if (this.focused && !this.disabled) {
+      // Focused and not disabled.
       return {
         'text-primary-900': true,
       };
@@ -55,5 +61,10 @@ export class CheckboxButtonComponent {
   /** Get focused status */
   get focused(): boolean {
     return this._checkboxService.focused;
+  }
+
+  /** Get disabled status */
+  get disabled(): boolean {
+    return this._checkboxService.disabled;
   }
 }

@@ -10,6 +10,9 @@ export class RadioGroupService {
   /** Focused status */
   focused$ = new BehaviorSubject(false);
 
+  /** Disabled status */
+  disabled$ = new BehaviorSubject(false);
+
   /** Emits with value of option when selected */
   selectOption = new EventEmitter<any>();
 
@@ -31,5 +34,15 @@ export class RadioGroupService {
   /** Set selected focused */
   set focused(focused: boolean) {
     this.focused$.next(focused);
+  }
+
+  /** Get selected disabled */
+  get disabled(): boolean {
+    return this.disabled$.value;
+  }
+
+  /** Set selected disabled */
+  set disabled(disabled: boolean) {
+    this.disabled$.next(disabled);
   }
 }

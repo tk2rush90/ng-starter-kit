@@ -95,6 +95,14 @@ export class CheckboxComponent extends AppControlValueAccessor {
     this.checkedChange.emit(value);
   }
 
+  /** Set disabled status */
+  override setDisabledState(isDisabled: boolean) {
+    super.setDisabledState(isDisabled);
+
+    // Apply to service.
+    this._checkboxService.disabled = isDisabled;
+  }
+
   /** Check the checkbox */
   check(): void {
     if (this.disabled) {

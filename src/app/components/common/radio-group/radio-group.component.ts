@@ -126,6 +126,14 @@ export class RadioGroupComponent extends AppControlValueAccessor {
     this.value = obj;
   }
 
+  /** Set disabled status */
+  override setDisabledState(isDisabled: boolean) {
+    super.setDisabledState(isDisabled);
+
+    // Apply to service.
+    this._radioGroupService.disabled = isDisabled;
+  }
+
   /** Move to previous option */
   toPreviousOption(): void {
     if (!this.disabled) {

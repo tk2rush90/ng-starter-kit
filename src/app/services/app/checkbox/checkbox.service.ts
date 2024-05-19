@@ -10,6 +10,9 @@ export class CheckboxService {
   /** Focused status */
   focused$ = new BehaviorSubject(false);
 
+  /** Disabled status */
+  disabled$ = new BehaviorSubject(false);
+
   /** Get checked status */
   get checked(): boolean {
     return this.checked$.value;
@@ -28,5 +31,15 @@ export class CheckboxService {
   /** Set selected focused */
   set focused(focused: boolean) {
     this.focused$.next(focused);
+  }
+
+  /** Get selected disabled */
+  get disabled(): boolean {
+    return this.disabled$.value;
+  }
+
+  /** Set selected disabled */
+  set disabled(disabled: boolean) {
+    this.disabled$.next(disabled);
   }
 }
