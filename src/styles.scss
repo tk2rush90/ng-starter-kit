@@ -15,4 +15,12 @@
   .flex-col-stretch {
     @apply flex flex-col items-stretch;
   }
+
+  .app-icon {
+    @apply block;
+
+    svg {
+      @apply block w-full h-full;
+    }
+  }
 }
