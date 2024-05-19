@@ -29,7 +29,7 @@ export class CheckboxButtonComponent {
       };
     } else {
       return {
-        'border-slate-300': true,
+        'border-zinc-300': true,
       };
     }
   }
