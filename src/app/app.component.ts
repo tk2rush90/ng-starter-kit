@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RadioGroupComponent } from './components/common/radio-group/radio-group.component';
+import { RadioComponent } from './components/common/radio-group/radio/radio.component';
+import { RadioButtonComponent } from './components/common/radio-group/radio/radio-button/radio-button.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RadioGroupComponent, RadioComponent, RadioButtonComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
