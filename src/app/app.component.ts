@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { RadioGroupComponent } from './components/common/radio-group/radio-group.component';
 import { RadioComponent } from './components/common/radio-group/radio/radio.component';
 import { RadioButtonComponent } from './components/common/radio-group/radio/radio-button/radio-button.component';
 import { CheckboxComponent } from './components/common/checkbox/checkbox.component';
 import { CheckboxButtonComponent } from './components/common/checkbox/checkbox-button/checkbox-button.component';
+import { FormFieldComponent } from './components/common/form-field/form-field.component';
+import { Platform } from './utils/platform';
 
 @Component({
   selector: 'app-root',
@@ -14,10 +16,15 @@ import { CheckboxButtonComponent } from './components/common/checkbox/checkbox-b
     RadioButtonComponent,
     CheckboxComponent,
     CheckboxButtonComponent,
+    FormFieldComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
   title = 'ng-starter-kit';
+
+  constructor(@Inject(PLATFORM_ID) private readonly _platformId: Object) {
+    Platform.setPlatformId(this._platformId);
+  }
 }

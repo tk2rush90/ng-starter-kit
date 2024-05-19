@@ -3,6 +3,10 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  outline: 0;
+}
+
 @layer base {
   .flex-center {
     @apply flex items-center justify-center;
@@ -21,6 +25,83 @@
 
     svg {
       @apply block w-full h-full;
+    }
+  }
+
+  // Form field style.
+  .app-form-field {
+    @apply select-none;
+
+    // Label in form field.
+    label {
+      @apply text-sm text-zinc-400;
+    }
+
+    // Control elements default styles.
+    input, select, textarea {
+      @apply bg-transparent;
+
+      &::placeholder {
+        @apply text-zinc-400;
+      }
+    }
+
+    // When focused.
+    &.focused {
+      .control-container {
+        @apply border-primary-400 bg-primary-50;
+      }
+    }
+
+    &.disabled {
+      .control-container {
+        @apply border-zinc-300 bg-zinc-50;
+      }
+    }
+
+    // Default style of control container.
+    .control-container {
+      @apply border border-zinc-300 rounded-lg transition-colors;
+    }
+
+    // When having input,
+    &.with-input {
+      .control-container {
+        @apply flex-center-between gap-4 px-4 h-12;
+
+        // Input element.
+        input {
+          @apply grow shrink w-0 basis-0;
+
+          &:not(:focus) {
+            @apply truncate;
+          }
+        }
+      }
+    }
+
+    // When having select,
+    &.with-select {
+      .control-container {
+        @apply flex-center-between gap-4 px-4 h-12 cursor-pointer;
+
+        // Select element.
+        select {
+          @apply grow shrink w-0 basis-0 appearance-none cursor-pointer truncate;
+        }
+      }
+    }
+
+    // When having textarea,
+    &.with-textarea {
+      .control-container {
+        @apply flex-col-stretch gap-2 p-4;
+
+        // Textarea element.
+        textarea {
+          @apply w-full overflow-auto;
+        }
+      }
     }
   }
 }
