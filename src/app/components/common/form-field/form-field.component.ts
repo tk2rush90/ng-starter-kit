@@ -115,8 +115,8 @@ export class FormFieldComponent implements AfterContentInit {
       if (this._selectOpened) {
         // Close options.
         this._selectOpened = false;
-      } else {
-        // Open options.
+      } else if (!this.disabled) {
+        // Open options. Only works when not disabled.
         (this.controlElement as HTMLSelectElement).showPicker();
         this._selectOpened = true;
       }
