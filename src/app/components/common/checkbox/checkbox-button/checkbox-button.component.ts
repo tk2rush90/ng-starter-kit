@@ -1,19 +1,49 @@
-import { Component } from '@angular/core';
+import { Component, HostBinding } from '@angular/core';
 import { CheckboxService } from '../../../../services/app/checkbox/checkbox.service';
+import { IconCheckComponent } from '../../../icons/icon-check/icon-check.component';
 
 /** Checkbox button with checked status */
 @Component({
   selector: 'app-checkbox-button',
   standalone: true,
-  imports: [],
+  imports: [IconCheckComponent],
   templateUrl: './checkbox-button.component.html',
   styleUrl: './checkbox-button.component.scss',
   host: {
-    class: 'flex-center rounded border border-slate-300 w-5 h-5',
+    class: 'flex-center rounded border w-5 h-5 transition-colors',
   },
 })
 export class CheckboxButtonComponent {
   constructor(private readonly _checkboxService: CheckboxService) {}
+
+  /** Get host classes by `focused` and `checked` status */
+  @HostBinding('class')
+  get hostClasses(): object {
+    if (this.checked && this.focused) {
+      // When checked and focused.
+      return {
+        'border-primary-500': true,
+        'bg-primary-100': true,
+      };
+    } else {
+      return {
+        'border-slate-300': true,
+      };
+    }
+  }
+
+  /** Get classes for selected indicator by `focused` status */
+  get indicatorClasses(): object {
+    if (this._checkboxService.focused) {
+      return {
+        'text-primary-900': true,
+      };
+    } else {
+      return {
+        'text-zinc-900': true,
+      };
+    }
+  }
 
   /** Get checked status */
   get checked(): boolean {

@@ -18,7 +18,7 @@ import { CheckboxService } from '../../../services/app/checkbox/checkbox.service
   styleUrl: './checkbox.component.scss',
   host: {
     tabindex: '0',
-    class: 'headwind-checkbox',
+    class: 'cursor-pointer select-none',
     role: 'checkbox',
     ['[attr.aria-checked]']: 'checked',
     ['[class.headwind-checked]']: 'checked',
@@ -61,10 +61,18 @@ export class CheckboxComponent extends AppControlValueAccessor {
     this.toggle();
   }
 
+  /** Listen focus event to set `focused` status of service */
+  @HostListener('focus')
+  onHostFocus(): void {
+    this._checkboxService.focused = true;
+  }
+
   /** Listen blur event to mark as touched */
   @HostListener('blur')
   onHostBlur(): void {
     this.onTouched();
+
+    this._checkboxService.focused = false;
   }
 
   /** Listen space keydown for accessibility */
