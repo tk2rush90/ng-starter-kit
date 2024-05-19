@@ -23,19 +23,17 @@ export class RadioButtonComponent {
   /** Get classes for host element by `focused` status */
   @HostBinding('class')
   get hostClasses(): object {
-    // When selected and focused.
-    if (this.selected) {
-      if (this._radioGroupService.focused) {
-        return {
-          'border-primary-500': true,
-          'bg-primary-100': true,
-        };
-      }
+    if (this.selected && this.focused) {
+      // When selected and focused.
+      return {
+        'border-primary-500': true,
+        'bg-primary-100': true,
+      };
+    } else {
+      return {
+        'border-zinc-300': true,
+      };
     }
-
-    return {
-      'border-zinc-300': true,
-    };
   }
 
   /** Get classes for selected indicator by `focused` status */
@@ -49,5 +47,10 @@ export class RadioButtonComponent {
         'bg-zinc-400': true,
       };
     }
+  }
+
+  /** Get radio group focused status */
+  get focused(): boolean {
+    return this._radioGroupService.focused;
   }
 }
