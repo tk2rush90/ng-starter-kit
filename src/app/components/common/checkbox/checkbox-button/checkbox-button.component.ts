@@ -1,6 +1,7 @@
 import { Component, HostBinding } from '@angular/core';
 import { CheckboxService } from '../../../../services/app/checkbox/checkbox.service';
 import { IconCheckComponent } from '../../../icons/icon-check/icon-check.component';
+import { fadeInOut } from '../../../../animations/fade-in-out';
 
 /** Checkbox button with checked status */
 @Component({
@@ -12,6 +13,7 @@ import { IconCheckComponent } from '../../../icons/icon-check/icon-check.compone
   host: {
     class: 'flex-center rounded border w-5 h-5 transition-colors',
   },
+  animations: [fadeInOut('checkboxButtonFadeInOut')],
 })
 export class CheckboxButtonComponent {
   constructor(private readonly _checkboxService: CheckboxService) {}

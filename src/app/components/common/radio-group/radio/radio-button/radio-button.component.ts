@@ -1,5 +1,6 @@
 import { Component, HostBinding } from '@angular/core';
 import { RadioGroupService } from '../../../../../services/app/radio-group/radio-group.service';
+import { fadeInOut } from '../../../../../animations/fade-in-out';
 
 /** A button that displays selected status */
 @Component({
@@ -11,6 +12,7 @@ import { RadioGroupService } from '../../../../../services/app/radio-group/radio
   host: {
     class: 'flex-center w-5 h-5 rounded-full border transition-colors',
   },
+  animations: [fadeInOut('radioButtonFadeInOut')],
 })
 export class RadioButtonComponent {
   /** Internal selected status to show and hide selected icon */
