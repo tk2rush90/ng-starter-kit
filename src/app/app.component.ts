@@ -1,4 +1,10 @@
-import { Component, Inject, PLATFORM_ID } from '@angular/core';
+import {
+  Component,
+  Inject,
+  PLATFORM_ID,
+  TemplateRef,
+  ViewChild,
+} from '@angular/core';
 import { RadioGroupComponent } from './components/common/radio-group/radio-group.component';
 import { RadioComponent } from './components/common/radio-group/radio/radio.component';
 import { RadioButtonComponent } from './components/common/radio-group/radio/radio-button/radio-button.component';
@@ -10,6 +16,9 @@ import { FlatButtonDirective } from './components/common/flat-button/flat-button
 import { TextareaResizerDirective } from './components/common/textarea-resizer/textarea-resizer.directive';
 import { StrokeButtonDirective } from './components/common/stroke-button/stroke-button.directive';
 import { SpinnerComponent } from './components/common/spinner/spinner.component';
+import { OverlayService } from './services/app/overlay/overlay.service';
+import { BackdropComponent } from './components/common/backdrop/backdrop.component';
+import { ModalComponent } from './components/common/modal/modal.component';
 
 @Component({
   selector: 'app-root',
@@ -25,14 +34,28 @@ import { SpinnerComponent } from './components/common/spinner/spinner.component'
     TextareaResizerDirective,
     StrokeButtonDirective,
     SpinnerComponent,
+    BackdropComponent,
+    ModalComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
+  @ViewChild('testModal', { read: TemplateRef })
+  testModalTemplateRef?: TemplateRef<any>;
+
   title = 'ng-starter-kit';
 
-  constructor(@Inject(PLATFORM_ID) private readonly _platformId: Object) {
+  constructor(
+    @Inject(PLATFORM_ID) private readonly _platformId: Object,
+    private readonly _overlayService: OverlayService,
+  ) {
     Platform.setPlatformId(this._platformId);
+  }
+
+  openOverlay(): void {
+    if (this.testModalTemplateRef) {
+      this._overlayService.open(this.testModalTemplateRef);
+    }
   }
 }

@@ -7,6 +7,7 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import { OverlayOutletComponent } from '../../../components/common/overlay-outlet/overlay-outlet.component';
+import { NodeUtil } from '../../../utils/node-util';
 
 /** Options to open overlay */
 export interface OverlayOptions {
@@ -129,5 +130,29 @@ export class OverlayService {
       this._openedOverlayRefs[this._openedOverlayRefs.length - 1]; // item is removed from the `onDestroy()` method
 
     latestOverlayRef?.embeddedViewRef.destroy();
+  }
+
+  /**
+   * Close an overlay that contains provided `element` as a child.
+   * If overlay not found, it does nothing.
+   * @param element - `HTMLElement` to find `OverlayRef`.
+   */
+  closeByElement(element: HTMLElement): void {
+    // Find target `OverlayRef` that contains `element` as a child.
+    const targetOverlayRef = this._openedOverlayRefs.find((_overlayRef) => {
+      return _overlayRef.embeddedViewRef.rootNodes.some((_node) => {
+        return _node === element || NodeUtil.containsTargetNode(_node, element);
+      });
+    });
+
+    if (targetOverlayRef) {
+      // Destroy rendered `EmbeddedViewRef` of found target.
+      targetOverlayRef?.embeddedViewRef.destroy();
+
+      // Remove `OverlayRef` from the list.
+      this._openedOverlayRefs = this._openedOverlayRefs.filter(
+        (_overlayRef) => _overlayRef !== targetOverlayRef,
+      );
+    }
   }
 }
