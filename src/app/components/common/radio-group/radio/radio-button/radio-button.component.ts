@@ -10,7 +10,7 @@ import { fadeInOut } from '../../../../../animations/fade-in-out';
   templateUrl: './radio-button.component.html',
   styleUrl: './radio-button.component.scss',
   host: {
-    class: 'flex-center w-5 h-5 rounded-full border transition-colors',
+    class: 'flex-center w-5 h-5 rounded-full border transition-colors relative',
   },
   animations: [fadeInOut('radioButtonFadeInOut')],
 })

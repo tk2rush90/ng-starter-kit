@@ -9,6 +9,7 @@ import { Platform } from './utils/platform';
 import { FlatButtonDirective } from './components/common/flat-button/flat-button.directive';
 import { TextareaResizerDirective } from './components/common/textarea-resizer/textarea-resizer.directive';
 import { StrokeButtonDirective } from './components/common/stroke-button/stroke-button.directive';
+import { SpinnerComponent } from './components/common/spinner/spinner.component';
 
 @Component({
   selector: 'app-root',
@@ -23,6 +24,7 @@ import { StrokeButtonDirective } from './components/common/stroke-button/stroke-
     FlatButtonDirective,
     TextareaResizerDirective,
     StrokeButtonDirective,
+    SpinnerComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

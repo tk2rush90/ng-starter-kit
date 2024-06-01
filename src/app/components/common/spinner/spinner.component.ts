@@ -1,6 +1,10 @@
 import { Component } from '@angular/core';
 
-/** A loading spinner. Width and height must be set when using */
+/**
+ * A simple loading spinner.
+ * Width, height, and color should be set when using.
+ * Color of spinner can be changed by setting text color to this component.
+ */
 @Component({
   selector: 'app-spinner',
   standalone: true,
