@@ -8,6 +8,7 @@ import { FormFieldComponent } from './components/common/form-field/form-field.co
 import { Platform } from './utils/platform';
 import { FlatButtonDirective } from './components/common/flat-button/flat-button.directive';
 import { TextareaResizerDirective } from './components/common/textarea-resizer/textarea-resizer.directive';
+import { StrokeButtonDirective } from './components/common/stroke-button/stroke-button.directive';
 
 @Component({
   selector: 'app-root',
@@ -21,6 +22,7 @@ import { TextareaResizerDirective } from './components/common/textarea-resizer/t
     FormFieldComponent,
     FlatButtonDirective,
     TextareaResizerDirective,
+    StrokeButtonDirective,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
