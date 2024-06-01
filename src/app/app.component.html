@@ -1,4 +1,4 @@
-<app-radio-group class="flex-col-stretch gap-2 w-full max-w-[400px]" disabled>
+<app-radio-group class="flex-col-stretch gap-2 w-full max-w-[400px]">
   <app-radio value="1" class="flex items-center justify-between rounded-lg border border-zinc-300 p-4">
     <label class="text-sm">
       이런~
@@ -18,7 +18,7 @@
   </app-radio>
 </app-radio-group>
 
-<app-checkbox class="flex items-center gap-2" disabled>
+<app-checkbox class="flex items-center gap-2">
   <label class="text-sm">
     이런..
   </label>
@@ -31,7 +31,7 @@
     이런~
   </label>
 
-  <input disabled/>
+  <input/>
 </app-form-field>
 
 <app-form-field>
@@ -39,7 +39,7 @@
     이런~
   </label>
 
-  <select disabled>
+  <select>
     <option>1</option>
   </select>
 </app-form-field>
@@ -49,5 +49,37 @@
     이런~
   </label>
 
-  <textarea disabled></textarea>
+  <textarea></textarea>
 </app-form-field>
+
+<app-form-field>
+  <label>
+    이런~
+  </label>
+
+  <textarea appTextareaResizer></textarea>
+</app-form-field>
+
+<button appFlatButton>
+  버튼
+</button>
+
+<button appFlatButton theme="secondary">
+  버튼
+</button>
+
+<button appFlatButton theme="tertiary">
+  버튼
+</button>
+
+<button appFlatButton theme="error">
+  버튼
+</button>
+
+<button appFlatButton theme="warn">
+  버튼
+</button>
+
+<button appFlatButton theme="success">
+  버튼
+</button>

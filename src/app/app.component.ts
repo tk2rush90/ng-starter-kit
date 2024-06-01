@@ -6,6 +6,8 @@ import { CheckboxComponent } from './components/common/checkbox/checkbox.compone
 import { CheckboxButtonComponent } from './components/common/checkbox/checkbox-button/checkbox-button.component';
 import { FormFieldComponent } from './components/common/form-field/form-field.component';
 import { Platform } from './utils/platform';
+import { FlatButtonDirective } from './components/common/flat-button/flat-button.directive';
+import { TextareaResizerDirective } from './components/common/textarea-resizer/textarea-resizer.directive';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +19,8 @@ import { Platform } from './utils/platform';
     CheckboxComponent,
     CheckboxButtonComponent,
     FormFieldComponent,
+    FlatButtonDirective,
+    TextareaResizerDirective,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

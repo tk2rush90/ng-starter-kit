@@ -31,7 +31,7 @@ export class RadioButtonComponent {
     } else if (this.selected && this.focused) {
       // When selected and focused.
       return {
-        'border-primary-500': true,
+        'border-primary-600': true,
         'bg-primary-100': true,
       };
     } else {
@@ -46,7 +46,7 @@ export class RadioButtonComponent {
     if (this.focused && !this.disabled) {
       // Focused and not disabled.
       return {
-        'bg-primary-500': true,
+        'bg-primary-600': true,
       };
     } else {
       return {

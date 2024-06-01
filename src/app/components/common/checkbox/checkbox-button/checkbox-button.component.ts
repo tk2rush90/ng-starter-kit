@@ -29,7 +29,7 @@ export class CheckboxButtonComponent {
     } else if (this.focused || (this.checked && this.focused)) {
       // When focused, or checked and focused.
       return {
-        'border-primary-500': true,
+        'border-primary-600': true,
         'bg-primary-100': true,
       };
     } else {
