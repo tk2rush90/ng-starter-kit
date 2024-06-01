@@ -12,6 +12,7 @@ import {
   OverlayRef,
   OverlayService,
 } from '../../../services/app/overlay/overlay.service';
+import { scaleUpDown } from '../../../animations/scale-up-down';
 
 /** A modal container */
 @Component({
@@ -26,8 +27,9 @@ import {
     // To bind `transform` animation or TailwindCSS classes, use `translate` attribute.
     '[style.translate]': `'-50% -50%'`,
     '[@modalFadeInOut]': '',
+    '[@modalScaleUpDown]': '',
   },
-  animations: [fadeInOut('modalFadeInOut')],
+  animations: [fadeInOut('modalFadeInOut'), scaleUpDown('modalScaleUpDown')],
 })
 export class ModalComponent implements AfterContentInit, OnDestroy {
   /** `OverlayRef` after modal opened as overlay. When it's not provided, modal won't be closed on clicking outside */
