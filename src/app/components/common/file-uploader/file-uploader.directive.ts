@@ -6,7 +6,10 @@ import {
   Output,
 } from '@angular/core';
 
-/** A directive that handles file uploading for file input */
+/**
+ * A directive that handles file uploading for file input.
+ * Explicit `accept` attribute is required without wildcard character.
+ */
 @Directive({
   selector: 'input[type="file"][appFileUploader]',
   standalone: true,
