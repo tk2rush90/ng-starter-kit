@@ -42,7 +42,15 @@ export class FileUploaderDirective {
 
         // Check type matched.
         const typeMatched = allowedMimetypes.some((_mimetype) => {
-          return _mimetype === _file.type;
+          if (_mimetype === '*/*') {
+            return true;
+          } else if (/.+\/*/.exec(_mimetype)) {
+            const starts = _mimetype.split('/')[0];
+
+            return _file.type.startsWith(starts);
+          } else {
+            return _mimetype === _file.type;
+          }
         });
 
         if (typeMatched) {

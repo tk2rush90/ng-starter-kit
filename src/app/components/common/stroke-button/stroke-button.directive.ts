@@ -7,7 +7,7 @@ import { BaseButton } from '../base-button/base-button';
   standalone: true,
   host: {
     class:
-      'px-2 h-10 border rounded transition-colors disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400 disabled:border-zinc-100',
+      'px-2 h-8 text-sm border rounded transition-colors disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400 disabled:border-zinc-100',
   },
 })
 export class StrokeButtonDirective extends BaseButton {

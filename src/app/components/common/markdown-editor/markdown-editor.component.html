@@ -47,11 +47,110 @@
     class="flex-center w-8 h-8 select-none">
     <app-icon-format-quote class="w-5 h-5"></app-icon-format-quote>
   </button>
+
+  <button
+    (click)="imageUploader.click()"
+    (mousedown)="$event.preventDefault()"
+    type="button"
+    class="flex-center w-8 h-8 select-none">
+    <app-icon-photo class="w-5 h-5"></app-icon-photo>
+  </button>
+
+  <button
+    (click)="insertLink()"
+    (mousedown)="$event.preventDefault()"
+    type="button"
+    class="flex-center w-8 h-8 select-none">
+    <app-icon-link class="w-5 h-5"></app-icon-link>
+  </button>
 </div>
 
-<textarea
-  spellcheck="false"
-  class="resize-y p-4 border border-zinc-300 rounded"
-  appMarkdownTextarea></textarea>
+<div class="flex-col-stretch">
+  @if (viewType === 'mirror') {
+    <div class="flex items-stretch border border-zinc-300 rounded max-h-96">
+      <div class="p-4 grow shrink w-0 basis-0">
+        <ng-container [ngTemplateOutlet]="textareaEditor"></ng-container>
+      </div>
 
-<input/>
+      <div class="w-px bg-zinc-300"></div>
+
+      <div class="p-4 grow shrink w-0 basis-0">
+        <ng-container [ngTemplateOutlet]="preview"></ng-container>
+      </div>
+    </div>
+  } @else {
+    <div class="border border-zinc-300 p-4 rounded">
+      @switch (viewType) {
+        @case ('editor') {
+          <ng-container [ngTemplateOutlet]="textareaEditor"></ng-container>
+        }
+
+        @case ('preview') {
+          <ng-container [ngTemplateOutlet]="preview"></ng-container>
+        }
+      }
+    </div>
+  }
+
+  <div class="flex items-center -my-px z-10 relative ml-1 gap-0.5">
+    <button
+      (click)="changeViewType('editor')"
+      [class.border-t]="viewType !== 'editor'"
+      [class.bg-zinc-100]="viewType !== 'editor'"
+      [class.text-zinc-400]="viewType !== 'editor'"
+      class="flex-center h-6 text-xs px-1 rounded-b border-b border-x border-zinc-300 bg-white"
+      type="button">
+      에디터
+    </button>
+
+    <button
+      (click)="changeViewType('preview')"
+      [class.border-t]="viewType !== 'preview'"
+      [class.bg-zinc-100]="viewType !== 'preview'"
+      [class.text-zinc-400]="viewType !== 'preview'"
+      class="flex-center h-6 text-xs px-1 rounded-b border-b border-x border-zinc-300 bg-white"
+      type="button">
+      미리보기
+    </button>
+
+    <button
+      (click)="changeViewType('mirror')"
+      [class.border-t]="viewType !== 'mirror'"
+      [class.bg-zinc-100]="viewType !== 'mirror'"
+      [class.text-zinc-400]="viewType !== 'mirror'"
+      class="flex-center h-6 text-xs px-1 rounded-b border-b border-x border-zinc-300 bg-white"
+      type="button">
+      라이브 미리보기
+    </button>
+  </div>
+
+  <input
+    #imageUploader
+    (uploaded)="onFileUploaded($event)"
+    (invalidFileType)="onInvalidFileType()"
+    hidden="hidden"
+    type="file"
+    accept="image/*"
+    appFileUploader
+    multiple/>
+</div>
+
+<ng-template #textareaEditor>
+  <textarea
+    (selectionChange)="onTextareaSelectionChange()"
+    (keydown)="updateContent($event)"
+    (keyup)="updateContent($event)"
+    (input)="updateContent($event)"
+    [value]="content"
+    spellcheck="false"
+    class="text-sm min-h-20 block w-full"
+    appSelectionChangeDetector
+    appTextareaResizer
+    appMarkdownTextarea></textarea>
+</ng-template>
+
+<ng-template #preview>
+  <div
+    [innerHTML]="renderedContent"
+    class="prose prose-blue prose-sm overflow-auto max-w-none max-h-full"></div>
+</ng-template>

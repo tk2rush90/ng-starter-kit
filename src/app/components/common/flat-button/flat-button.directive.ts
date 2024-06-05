@@ -7,7 +7,7 @@ import { BaseButton } from '../base-button/base-button';
   standalone: true,
   host: {
     class:
-      'px-2 rounded h-10 transition-colors disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400',
+      'px-2 rounded h-8 text-sm transition-colors disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400',
   },
 })
 export class FlatButtonDirective extends BaseButton {
