@@ -19,6 +19,10 @@ import { SpinnerComponent } from './components/common/spinner/spinner.component'
 import { OverlayService } from './services/app/overlay/overlay.service';
 import { BackdropComponent } from './components/common/backdrop/backdrop.component';
 import { ModalComponent } from './components/common/modal/modal.component';
+import { FormsModule } from '@angular/forms';
+import { MarkdownService } from './services/app/markdown/markdown.service';
+import { MarkdownTextareaDirective } from './components/common/markdown-textarea/markdown-textarea.directive';
+import { MarkdownEditorComponent } from './components/common/markdown-editor/markdown-editor.component';
 
 @Component({
   selector: 'app-root',
@@ -36,6 +40,9 @@ import { ModalComponent } from './components/common/modal/modal.component';
     SpinnerComponent,
     BackdropComponent,
     ModalComponent,
+    FormsModule,
+    MarkdownTextareaDirective,
+    MarkdownEditorComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -46,9 +53,14 @@ export class AppComponent {
 
   title = 'ng-starter-kit';
 
+  content = '';
+
+  renderedContent = '';
+
   constructor(
     @Inject(PLATFORM_ID) private readonly _platformId: Object,
     private readonly _overlayService: OverlayService,
+    private readonly _markdownService: MarkdownService,
   ) {
     Platform.setPlatformId(this._platformId);
   }

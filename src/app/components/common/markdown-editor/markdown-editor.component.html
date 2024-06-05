@@ -1,0 +1,57 @@
+<div class="flex items-center flex-nowrap overflow-auto">
+  <!-- Prevent mousedown to keep focus on textarea -->
+  <button
+    (click)="insertHeading(1)"
+    (mousedown)="$event.preventDefault()"
+    type="button"
+    class="flex-center w-8 h-8 select-none">
+    <app-icon-format-h1 class="w-5 h-5"></app-icon-format-h1>
+  </button>
+
+  <button
+    (click)="insertHeading(2)"
+    (mousedown)="$event.preventDefault()"
+    type="button"
+    class="flex-center w-8 h-8 select-none">
+    <app-icon-format-h2 class="w-5 h-5"></app-icon-format-h2>
+  </button>
+
+  <button
+    (click)="insertHeading(3)"
+    (mousedown)="$event.preventDefault()"
+    type="button"
+    class="flex-center w-8 h-8 select-none">
+    <app-icon-format-h3 class="w-5 h-5"></app-icon-format-h3>
+  </button>
+
+  <button
+    (click)="insertList('unordered')"
+    (mousedown)="$event.preventDefault()"
+    type="button"
+    class="flex-center w-8 h-8 select-none">
+    <app-icon-format-list-bulleted class="w-5 h-5"></app-icon-format-list-bulleted>
+  </button>
+
+  <button
+    (click)="insertList('ordered')"
+    (mousedown)="$event.preventDefault()"
+    type="button"
+    class="flex-center w-8 h-8 select-none">
+    <app-icon-format-list-numbered class="w-5 h-5"></app-icon-format-list-numbered>
+  </button>
+
+  <button
+    (click)="toggleQuote()"
+    (mousedown)="$event.preventDefault()"
+    type="button"
+    class="flex-center w-8 h-8 select-none">
+    <app-icon-format-quote class="w-5 h-5"></app-icon-format-quote>
+  </button>
+</div>
+
+<textarea
+  spellcheck="false"
+  class="resize-y p-4 border border-zinc-300 rounded"
+  appMarkdownTextarea></textarea>
+
+<input/>

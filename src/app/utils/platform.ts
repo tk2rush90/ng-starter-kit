@@ -23,11 +23,19 @@ export class Platform {
   }
 
   /**
-   * Get status whether platform is server or not.
+   * Get status of whether platform is server or not.
    * @return Boolean status.
    */
   static get isServer(): boolean {
     return isPlatformServer(this._platformId);
+  }
+
+  /**
+   * Get status of whether OS is created by Apple, inc. or not.
+   * @return Boolean status.
+   */
+  static get isApple(): boolean {
+    return this.os.name === 'iOS' || this.os.name === 'Mac OS';
   }
 
   /**
