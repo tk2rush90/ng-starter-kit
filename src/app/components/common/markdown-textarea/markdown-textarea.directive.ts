@@ -2,7 +2,9 @@ import {
   AfterContentInit,
   Directive,
   ElementRef,
+  EventEmitter,
   HostListener,
+  Output,
 } from '@angular/core';
 import { Platform } from '../../../utils/platform';
 import { Logger } from '../../../utils/logger';
@@ -17,6 +19,9 @@ import { MarkdownTextArea } from '../../../models/markdown-textarea';
   exportAs: 'markdownTextarea',
 })
 export class MarkdownTextareaDirective implements AfterContentInit {
+  /** Emits when images are pasted */
+  @Output() pasteImages = new EventEmitter<File[]>();
+
   /** A model for markdown textarea that contains features for markdown editor */
   markdownTextarea!: MarkdownTextArea;
 
@@ -40,6 +45,52 @@ export class MarkdownTextareaDirective implements AfterContentInit {
     this.markdownTextarea = new MarkdownTextArea(
       this._elementRef.nativeElement,
     );
+  }
+
+  /** Listen `paste` event to paste images */
+  @HostListener('paste', ['$event'])
+  onPaste(event: ClipboardEvent) {
+    if (event.clipboardData && event.clipboardData.files.length > 0) {
+      event.preventDefault();
+
+      const imageFiles: File[] = [];
+
+      // Filter image files.
+      for (let i = 0; i < event.clipboardData.files.length; i++) {
+        const file = event.clipboardData.files.item(i);
+
+        if (file && file.type.startsWith('image')) {
+          imageFiles.push(file);
+        }
+      }
+
+      if (imageFiles.length > 0) {
+        this.pasteImages.emit(imageFiles);
+      }
+    }
+  }
+
+  /** Listen `drop` event to paste images */
+  @HostListener('drop', ['$event'])
+  onDrop(event: DragEvent) {
+    if (event.dataTransfer && event.dataTransfer.files.length > 0) {
+      event.preventDefault();
+
+      const imageFiles: File[] = [];
+
+      // Filter image files.
+      for (let i = 0; i < event.dataTransfer.files.length; i++) {
+        const file = event.dataTransfer.files.item(i);
+
+        if (file && file.type.startsWith('image')) {
+          imageFiles.push(file);
+        }
+      }
+
+      if (imageFiles.length > 0) {
+        this.pasteImages.emit(imageFiles);
+      }
+    }
   }
 
   @HostListener('keydown', ['$event'])

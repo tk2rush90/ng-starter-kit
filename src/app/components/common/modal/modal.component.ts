@@ -23,7 +23,7 @@ import { scaleUpDown } from '../../../animations/scale-up-down';
   styleUrl: './modal.component.scss',
   host: {
     class:
-      'fixed bg-white rounded-lg p-4 flex-col-stretch shadow-lg top-1/2 left-1/2 pointer-events-auto',
+      'fixed bg-white rounded-lg p-4 flex-col-stretch shadow-lg top-1/2 left-1/2 pointer-events-auto max-h-[calc(100vh-32px)] overflow-auto',
     // To bind `transform` animation or TailwindCSS classes, use `translate` attribute.
     '[style.translate]': `'-50% -50%'`,
     '[@modalFadeInOut]': '',

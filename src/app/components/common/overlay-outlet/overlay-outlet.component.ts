@@ -3,7 +3,6 @@ import {
   HostListener,
   ViewChild,
   ViewContainerRef,
-  ViewEncapsulation,
 } from '@angular/core';
 import { OverlayService } from '../../../services/app/overlay/overlay.service';
 
@@ -14,7 +13,6 @@ import { OverlayService } from '../../../services/app/overlay/overlay.service';
   imports: [],
   templateUrl: './overlay-outlet.component.html',
   styleUrl: './overlay-outlet.component.scss',
-  encapsulation: ViewEncapsulation.None,
   host: {
     class:
       'block fixed z-[9999] top-0 bottom-0 left-0 right-0 pointer-events-none',

@@ -22,6 +22,9 @@ export interface OverlayOptions {
 
   /** Set to allow opening duplicated template at once */
   allowDuplicated?: boolean;
+
+  /** Set to prevent closing overlay by Escape key */
+  preventKeyboardClosing?: boolean;
 }
 
 /** Reference of opened overlay */
@@ -31,6 +34,12 @@ export interface OverlayRef<C> {
 
   /** Original `TemplateRef` of overlay */
   templateRef: TemplateRef<C>;
+
+  /** Keyboard closing prevented status */
+  keyboardClosingPrevented: boolean;
+
+  /** Close overlay */
+  close: () => void;
 }
 
 /** A service to open overlays */
@@ -95,9 +104,13 @@ export class OverlayService {
       this.viewContainerRef.createEmbeddedView(templateRef);
 
     // Create `OverlayRef`.
-    const overlayRef = {
+    const overlayRef: OverlayRef<any> = {
       embeddedViewRef,
       templateRef,
+      keyboardClosingPrevented: !!options?.preventKeyboardClosing,
+      close: () => {
+        this.close(overlayRef);
+      },
     };
 
     this._openedOverlayRefs.push(overlayRef);
@@ -116,7 +129,7 @@ export class OverlayService {
     // When `destroyRef` provided, destroy overlay when `destroyRef` destroyed.
     if (options?.destroyRef) {
       options.destroyRef.onDestroy(() => {
-        embeddedViewRef.destroy();
+        overlayRef.close();
       });
     }
 
@@ -124,11 +137,16 @@ export class OverlayService {
     return overlayRef;
   }
 
-  /** Close latest overlay */
+  /** Close latest overlay. It cannot close OverlayRef that has `keyboardClosingPrevented` */
   closeLatest(): void {
-    const latestOverlayRef =
-      this._openedOverlayRefs[this._openedOverlayRefs.length - 1]; // item is removed from the `onDestroy()` method
+    // Filter only closeable OverlayRefs.
+    const closeableOverlayRefs = this._openedOverlayRefs.filter(
+      (_overlayRef) => !_overlayRef.keyboardClosingPrevented,
+    );
 
+    const latestOverlayRef = closeableOverlayRefs.pop();
+
+    // `latestOverlayRef` will be removed from the `_openedOverlayRefs` when the `onDestroy()` method run.
     latestOverlayRef?.embeddedViewRef.destroy();
   }
 
@@ -146,13 +164,21 @@ export class OverlayService {
     });
 
     if (targetOverlayRef) {
-      // Destroy rendered `EmbeddedViewRef` of found target.
-      targetOverlayRef?.embeddedViewRef.destroy();
-
-      // Remove `OverlayRef` from the list.
-      this._openedOverlayRefs = this._openedOverlayRefs.filter(
-        (_overlayRef) => _overlayRef !== targetOverlayRef,
-      );
+      this.close(targetOverlayRef);
     }
+  }
+
+  /**
+   * Close OverlayRef.
+   * @param overlayRef - OverlayRef to close.
+   */
+  close(overlayRef: OverlayRef<any>): void {
+    // Destroy rendered `EmbeddedViewRef` of found target.
+    overlayRef?.embeddedViewRef.destroy();
+
+    // Remove `OverlayRef` from the list.
+    this._openedOverlayRefs = this._openedOverlayRefs.filter(
+      (_overlayRef) => _overlayRef !== overlayRef,
+    );
   }
 }

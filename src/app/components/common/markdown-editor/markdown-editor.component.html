@@ -1,10 +1,10 @@
-<div class="flex items-center flex-nowrap overflow-auto">
+<div class="flex items-center flex-nowrap overflow-auto grow shrink basis-auto w-auto">
   <!-- Prevent mousedown to keep focus on textarea -->
   <button
     (click)="insertHeading(1)"
     (mousedown)="$event.preventDefault()"
     type="button"
-    class="flex-center w-8 h-8 select-none">
+    class="flex-center w-8 h-8 select-none text-zinc-500 hover:text-zinc-800 transition-colors">
     <app-icon-format-h1 class="w-5 h-5"></app-icon-format-h1>
   </button>
 
@@ -12,7 +12,7 @@
     (click)="insertHeading(2)"
     (mousedown)="$event.preventDefault()"
     type="button"
-    class="flex-center w-8 h-8 select-none">
+    class="flex-center w-8 h-8 select-none text-zinc-500 hover:text-zinc-800 transition-colors">
     <app-icon-format-h2 class="w-5 h-5"></app-icon-format-h2>
   </button>
 
@@ -20,15 +20,39 @@
     (click)="insertHeading(3)"
     (mousedown)="$event.preventDefault()"
     type="button"
-    class="flex-center w-8 h-8 select-none">
+    class="flex-center w-8 h-8 select-none text-zinc-500 hover:text-zinc-800 transition-colors">
     <app-icon-format-h3 class="w-5 h-5"></app-icon-format-h3>
+  </button>
+
+  <button
+    (click)="toggleBold()"
+    (mousedown)="$event.preventDefault()"
+    type="button"
+    class="flex-center w-8 h-8 select-none text-zinc-500 hover:text-zinc-800 transition-colors">
+    <app-icon-format-bold class="w-5 h-5"></app-icon-format-bold>
+  </button>
+
+  <button
+    (click)="toggleItalic()"
+    (mousedown)="$event.preventDefault()"
+    type="button"
+    class="flex-center w-8 h-8 select-none text-zinc-500 hover:text-zinc-800 transition-colors">
+    <app-icon-format-italic class="w-5 h-5"></app-icon-format-italic>
+  </button>
+
+  <button
+    (click)="toggleStrike()"
+    (mousedown)="$event.preventDefault()"
+    type="button"
+    class="flex-center w-8 h-8 select-none text-zinc-500 hover:text-zinc-800 transition-colors">
+    <app-icon-format-strikethrough class="w-5 h-5"></app-icon-format-strikethrough>
   </button>
 
   <button
     (click)="insertList('unordered')"
     (mousedown)="$event.preventDefault()"
     type="button"
-    class="flex-center w-8 h-8 select-none">
+    class="flex-center w-8 h-8 select-none text-zinc-500 hover:text-zinc-800 transition-colors">
     <app-icon-format-list-bulleted class="w-5 h-5"></app-icon-format-list-bulleted>
   </button>
 
@@ -36,7 +60,7 @@
     (click)="insertList('ordered')"
     (mousedown)="$event.preventDefault()"
     type="button"
-    class="flex-center w-8 h-8 select-none">
+    class="flex-center w-8 h-8 select-none text-zinc-500 hover:text-zinc-800 transition-colors">
     <app-icon-format-list-numbered class="w-5 h-5"></app-icon-format-list-numbered>
   </button>
 
@@ -44,7 +68,7 @@
     (click)="toggleQuote()"
     (mousedown)="$event.preventDefault()"
     type="button"
-    class="flex-center w-8 h-8 select-none">
+    class="flex-center w-8 h-8 select-none text-zinc-500 hover:text-zinc-800 transition-colors">
     <app-icon-format-quote class="w-5 h-5"></app-icon-format-quote>
   </button>
 
@@ -52,7 +76,7 @@
     (click)="imageUploader.click()"
     (mousedown)="$event.preventDefault()"
     type="button"
-    class="flex-center w-8 h-8 select-none">
+    class="flex-center w-8 h-8 select-none text-zinc-500 hover:text-zinc-800 transition-colors">
     <app-icon-photo class="w-5 h-5"></app-icon-photo>
   </button>
 
@@ -60,14 +84,26 @@
     (click)="insertLink()"
     (mousedown)="$event.preventDefault()"
     type="button"
-    class="flex-center w-8 h-8 select-none">
+    class="flex-center w-8 h-8 select-none text-zinc-500 hover:text-zinc-800 transition-colors">
     <app-icon-link class="w-5 h-5"></app-icon-link>
+  </button>
+
+  <button
+    (click)="toggleScrollSync()"
+    (mousedown)="$event.preventDefault()"
+    type="button"
+    class="flex-center w-8 h-8 select-none text-zinc-500 hover:text-zinc-800 transition-colors">
+    @if (scrollSynced) {
+      <app-icon-sync class="w-5 h-5"></app-icon-sync>
+    } @else {
+      <app-icon-sync-disabled class="w-5 h-5"></app-icon-sync-disabled>
+    }
   </button>
 </div>
 
 <div class="flex-col-stretch">
   @if (viewType === 'mirror') {
-    <div class="flex items-stretch border border-zinc-300 rounded max-h-96">
+    <div class="flex items-stretch border border-zinc-300 rounded max-h-96 min-h-40">
       <div class="p-4 grow shrink w-0 basis-0">
         <ng-container [ngTemplateOutlet]="textareaEditor"></ng-container>
       </div>
@@ -79,7 +115,7 @@
       </div>
     </div>
   } @else {
-    <div class="border border-zinc-300 p-4 rounded">
+    <div class="border border-zinc-300 p-4 rounded min-h-20">
       @switch (viewType) {
         @case ('editor') {
           <ng-container [ngTemplateOutlet]="textareaEditor"></ng-container>
@@ -92,35 +128,45 @@
     </div>
   }
 
-  <div class="flex items-center -my-px z-10 relative ml-1 gap-0.5">
-    <button
-      (click)="changeViewType('editor')"
-      [class.border-t]="viewType !== 'editor'"
-      [class.bg-zinc-100]="viewType !== 'editor'"
-      [class.text-zinc-400]="viewType !== 'editor'"
-      class="flex-center h-6 text-xs px-1 rounded-b border-b border-x border-zinc-300 bg-white"
-      type="button">
-      에디터
-    </button>
+  <div class="flex items-start justify-between">
+    <div class="flex items-center -my-px z-10 relative ml-1 gap-0.5">
+      <button
+        (click)="changeViewType('editor')"
+        [class.border-t]="viewType !== 'editor'"
+        [class.bg-zinc-100]="viewType !== 'editor'"
+        [class.text-zinc-400]="viewType !== 'editor'"
+        class="flex-center h-6 text-xs px-1 rounded-b border-b border-x border-zinc-300 bg-white"
+        type="button">
+        에디터
+      </button>
+
+      <button
+        (click)="changeViewType('preview')"
+        [class.border-t]="viewType !== 'preview'"
+        [class.bg-zinc-100]="viewType !== 'preview'"
+        [class.text-zinc-400]="viewType !== 'preview'"
+        class="flex-center h-6 text-xs px-1 rounded-b border-b border-x border-zinc-300 bg-white"
+        type="button">
+        미리보기
+      </button>
+
+      <button
+        (click)="changeViewType('mirror')"
+        [class.border-t]="viewType !== 'mirror'"
+        [class.bg-zinc-100]="viewType !== 'mirror'"
+        [class.text-zinc-400]="viewType !== 'mirror'"
+        class="flex-center h-6 text-xs px-1 rounded-b border-b border-x border-zinc-300 bg-white"
+        type="button">
+        라이브 미리보기
+      </button>
+    </div>
 
     <button
-      (click)="changeViewType('preview')"
-      [class.border-t]="viewType !== 'preview'"
-      [class.bg-zinc-100]="viewType !== 'preview'"
-      [class.text-zinc-400]="viewType !== 'preview'"
-      class="flex-center h-6 text-xs px-1 rounded-b border-b border-x border-zinc-300 bg-white"
-      type="button">
-      미리보기
-    </button>
-
-    <button
-      (click)="changeViewType('mirror')"
-      [class.border-t]="viewType !== 'mirror'"
-      [class.bg-zinc-100]="viewType !== 'mirror'"
-      [class.text-zinc-400]="viewType !== 'mirror'"
-      class="flex-center h-6 text-xs px-1 rounded-b border-b border-x border-zinc-300 bg-white"
-      type="button">
-      라이브 미리보기
+      (click)="openGuide()"
+      (mousedown)="$event.preventDefault()"
+      type="button"
+      class="flex-center w-8 h-8 select-none text-zinc-500 hover:text-zinc-800 transition-colors">
+      <app-icon-question-mark-circle class="w-5 h-5"></app-icon-question-mark-circle>
     </button>
   </div>
 
@@ -137,13 +183,15 @@
 
 <ng-template #textareaEditor>
   <textarea
-    (selectionChange)="onTextareaSelectionChange()"
+    (pasteImages)="onFileUploaded($event)"
+    (selectionChange)="syncScrollPosition()"
+    (scroll)="syncScrollPosition()"
     (keydown)="updateContent($event)"
     (keyup)="updateContent($event)"
     (input)="updateContent($event)"
     [value]="content"
     spellcheck="false"
-    class="text-sm min-h-20 block w-full"
+    class="text-sm min-h-full max-h-full overflow-auto block w-full"
     appSelectionChangeDetector
     appTextareaResizer
     appMarkdownTextarea></textarea>
@@ -151,6 +199,226 @@
 
 <ng-template #preview>
   <div
+    #previewContainer
     [innerHTML]="renderedContent"
-    class="prose prose-blue prose-sm overflow-auto max-w-none max-h-full"></div>
+    class="prose prose-blue prose-sm overflow-auto max-w-none max-h-full break-all"></div>
+</ng-template>
+
+<ng-template #guide>
+  <app-backdrop class="bg-black/50"></app-backdrop>
+
+  <app-modal class="w-full max-w-[740px]">
+    <div class="flex-col-stretch gap-4">
+      <div class="flex-center-end">
+        <button
+          (click)="guideOverlayRef?.close()"
+          type="button"
+          class="w-8 h-8 flex-center">
+          <app-icon-x-mark class="w-5 h-5"></app-icon-x-mark>
+        </button>
+      </div>
+
+      <table class="w-full align-middle border-collapse text-sm">
+        <colgroup>
+          <col class="w-1/2"/>
+          <col class="w-1/2"/>
+        </colgroup>
+
+        <tr>
+          <th class="p-2 text-base text-left">
+            에디터
+          </th>
+
+          <th class="p-2 text-base text-left">
+            미리보기
+          </th>
+        </tr>
+
+        <tr>
+          <td class="p-2 border-t border-zinc-200">
+            # 제목1
+          </td>
+
+          <td class="p-2 border-t border-zinc-200">
+            <div
+              [innerHTML]="exampleHeading1"
+              class="prose prose-sm prose-blue"></div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="p-2 border-t border-zinc-200">
+            ## 제목2
+          </td>
+
+          <td class="p-2 border-t border-zinc-200">
+            <div
+              [innerHTML]="exampleHeading2"
+              class="prose prose-sm prose-blue"></div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="p-2 border-t border-zinc-200">
+            ### 제목3
+          </td>
+
+          <td class="p-2 border-t border-zinc-200">
+            <div
+              [innerHTML]="exampleHeading3"
+              class="prose prose-sm prose-blue"></div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="p-2 border-t border-zinc-200">
+            #### 제목4
+          </td>
+
+          <td class="p-2 border-t border-zinc-200">
+            <div
+              [innerHTML]="exampleHeading4"
+              class="prose prose-sm prose-blue"></div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="p-2 border-t border-zinc-200">
+            ##### 제목5
+          </td>
+
+          <td class="p-2 border-t border-zinc-200">
+            <div
+              [innerHTML]="exampleHeading5"
+              class="prose prose-sm prose-blue"></div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="p-2 border-t border-zinc-200">
+            ###### 제목6
+          </td>
+
+          <td class="p-2 border-t border-zinc-200">
+            <div
+              [innerHTML]="exampleHeading6"
+              class="prose prose-sm prose-blue"></div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="p-2 border-t border-zinc-200">
+            **굵게**
+          </td>
+
+          <td class="p-2 border-t border-zinc-200">
+            <div
+              [innerHTML]="exampleBold"
+              class="prose prose-sm prose-blue"></div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="p-2 border-t border-zinc-200">
+            _기울기_
+          </td>
+
+          <td class="p-2 border-t border-zinc-200">
+            <div
+              [innerHTML]="exampleItalic"
+              class="prose prose-sm prose-blue"></div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="p-2 border-t border-zinc-200">
+            ~~취소선~~
+          </td>
+
+          <td class="p-2 border-t border-zinc-200">
+            <div
+              [innerHTML]="exampleStrike"
+              class="prose prose-sm prose-blue"></div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="p-2 border-t border-zinc-200">
+            `code`
+          </td>
+
+          <td class="p-2 border-t border-zinc-200">
+            <div
+              [innerHTML]="exampleInlineCode"
+              class="prose prose-sm prose-blue"></div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="p-2 border-t border-zinc-200">
+            1. 첫 번째<br/>
+            1. 두 번째<br/>
+            1. 세 번째
+          </td>
+
+          <td class="p-2 border-t border-zinc-200">
+            <div
+              [innerHTML]="exampleOrderedList"
+              class="prose prose-sm prose-blue"></div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="p-2 border-t border-zinc-200">
+            - 첫 번째<br/>
+            - 두 번째<br/>
+            - 세 번째
+          </td>
+
+          <td class="p-2 border-t border-zinc-200">
+            <div
+              [innerHTML]="exampleUnorderedList"
+              class="prose prose-sm prose-blue"></div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="p-2 border-t border-zinc-200">
+            &gt; 일찍 일어나는 새가<br/>
+            &gt; 벌레를 잡는다
+          </td>
+
+          <td class="p-2 border-t border-zinc-200">
+            <div
+              [innerHTML]="exampleQuote"
+              class="prose prose-sm prose-blue"></div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="p-2 border-t border-zinc-200">
+            ![대체 텍스트](https://picsum.photos/id/1/50/50)
+          </td>
+
+          <td class="p-2 border-t border-zinc-200">
+            <div
+              [innerHTML]="exampleImage"
+              class="prose prose-sm prose-blue"></div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="p-2 border-t border-zinc-200">
+            [링크 텍스트](https://google.com)
+          </td>
+
+          <td class="p-2 border-t border-zinc-200">
+            <div
+              [innerHTML]="exampleLink"
+              class="prose prose-sm prose-blue"></div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </app-modal>
 </ng-template>
