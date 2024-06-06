@@ -2,8 +2,10 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  EventEmitter,
   Input,
   OnInit,
+  Output,
   TemplateRef,
   ViewChild,
 } from '@angular/core';
@@ -40,6 +42,16 @@ import { IconSyncComponent } from '../../icons/icon-sync/icon-sync.component';
 import { IconSyncDisabledComponent } from '../../icons/icon-sync-disabled/icon-sync-disabled.component';
 import { ToastService } from '../../../services/app/toast/toast.service';
 
+/** Attachment of markdown editor */
+export interface MarkdownEditorAttachment {
+  /** Actual file blob */
+  file: File;
+
+  /** Object url of file displaying in editor */
+  objectUrl: string;
+}
+
+/** An editor to write markdown */
 @Component({
   selector: 'app-markdown-editor',
   standalone: true,
@@ -77,6 +89,18 @@ import { ToastService } from '../../../services/app/toast/toast.service';
 export class MarkdownEditorComponent implements OnInit {
   /** Set default view type. Changing this value after rendered doesn't affect anything */
   @Input() defaultViewType?: MarkdownEditorViewType;
+
+  /** Emits when file has attached */
+  @Output() fileAttached = new EventEmitter<MarkdownEditorAttachment>();
+
+  /** Emits when `input` event triggered from the textarea */
+  @Output() editorInput = new EventEmitter<InputEvent>();
+
+  /** Emits when `keydown` event triggered from the textarea */
+  @Output() editorKeydown = new EventEmitter<KeyboardEvent>();
+
+  /** Emits when `keyup` event triggered from the textarea */
+  @Output() editorKeyup = new EventEmitter<KeyboardEvent>();
 
   /** Markdown textarea */
   @ViewChild(MarkdownTextareaDirective)
@@ -249,6 +273,12 @@ export class MarkdownEditorComponent implements OnInit {
 
       this.markdownTextareaDirective?.markdownTextarea.insertImage(objectUrl);
       this.markdownTextareaDirective?.textareaHistoryService.captureState();
+
+      // Emit event.
+      this.fileAttached.emit({
+        file: _file,
+        objectUrl,
+      });
     });
   }
 
