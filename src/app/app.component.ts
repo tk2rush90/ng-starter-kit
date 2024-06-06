@@ -1,10 +1,11 @@
 import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { Platform } from './utils/platform';
+import { MarkdownEditorComponent } from './components/common/markdown-editor/markdown-editor.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [],
+  imports: [MarkdownEditorComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

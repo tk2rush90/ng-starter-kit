@@ -3,6 +3,14 @@ module.exports = {
   content: ["./src/**/*.{html,ts}"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: [
+          "Pretendard Variable",
+          "Noto Sans KR",
+          "Malgun Gothic",
+          "sans-serif",
+        ],
+      },
       screens: {
         xs: "375px",
         sm: "425px",
