@@ -1,21 +1,17 @@
-import { Injectable } from '@angular/core';
-import { Platform } from '../../../utils/platform';
-import { Logger } from '../../../utils/logger';
+import { Logger } from './logger';
+import { Platform } from './platform';
 
-/** A service that manages `localStorage` */
-@Injectable({
-  providedIn: 'root',
-})
-export class LocalStorageService {
+/** Utility class for local storage with static methods */
+export class LocalStorageUtil {
   /** Logger */
-  private readonly _logger = new Logger('LocalStorageService');
+  private static readonly _logger = new Logger('LocalStorageService');
 
   /**
    * Set `value` to `localStorage` by `key`.
    * @param key - A key for `value`.
    * @param value - Value to set.
    */
-  set(key: string, value: string): void {
+  static set(key: string, value: string): void {
     if (Platform.isBrowser) {
       if (localStorage) {
         localStorage.setItem(key, value);
@@ -30,7 +26,7 @@ export class LocalStorageService {
    * @param key - Key to get value.
    * @return Value found by `key`. It there is no value, it returns empty string.
    */
-  get(key: string): string {
+  static get(key: string): string {
     if (Platform.isBrowser) {
       if (localStorage) {
         return localStorage.getItem(key) || '';
@@ -46,7 +42,7 @@ export class LocalStorageService {
    * Remove a value from `localStorage` by `key`.
    * @param key - Key to remove value.
    */
-  remove(key: string): void {
+  static remove(key: string): void {
     if (Platform.isBrowser) {
       if (localStorage) {
         localStorage.removeItem(key);
