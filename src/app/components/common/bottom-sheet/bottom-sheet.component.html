@@ -1,0 +1,18 @@
+<!-- Close button -->
+@if (displayClose) {
+  <button
+    (click)="close()"
+    class="absolute top-4 right-4"
+    appIconButton>
+    <app-icon-x-mark class="w-5 h-5"></app-icon-x-mark>
+  </button>
+}
+
+<!-- Title container -->
+<div class="flex-center">
+  <div class="text-xl font-semibold">
+    {{ sheetTitle }}
+  </div>
+</div>
+
+<ng-content></ng-content>
