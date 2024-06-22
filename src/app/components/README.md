@@ -14,11 +14,12 @@ app/
 │ │   ├ header.component.html
 │ │   ├ header.component.scss
 │ │   └ header.component.ts
-│ └ main-page/ # Directory for components that are only used for `main-page`
-│   └ banner/
-│     ├ banner.component.html
-│     ├ banner.component.scss
-│     └ banner.component.ts
+| └ pages/ # Directory to contain page specific components
+│   └ main-page/ # Directory for components that are only used for `main-page`
+│     └ banner/
+│       ├ banner.component.html
+│       ├ banner.component.scss
+│       └ banner.component.ts
 └ pages/
   └ main-page/
     ├ main-page.component.html
