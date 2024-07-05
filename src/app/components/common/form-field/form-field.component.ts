@@ -6,6 +6,7 @@ import {
   HostBinding,
   HostListener,
   Inject,
+  OnDestroy,
   QueryList,
   Renderer2,
   viewChild,
@@ -27,7 +28,7 @@ import { FormFieldAdditionalDirective } from './form-field-additional/form-field
     class: 'app-form-field flex-col-stretch gap-1',
   },
 })
-export class FormFieldComponent implements AfterContentInit {
+export class FormFieldComponent implements AfterContentInit, OnDestroy {
   /** Focused status of control element */
   @HostBinding('class.focused') focused = false;
 
@@ -48,17 +49,22 @@ export class FormFieldComponent implements AfterContentInit {
   });
 
   /** Rendered control element */
-  controlElement?:
-    | HTMLInputElement
-    | HTMLSelectElement
-    | HTMLTextAreaElement
-    | null;
+  controlElement?: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
 
   /** Opened status of select options */
   private _selectOpened = false;
 
+  /** Flag to set selectedOptions property to false after mouseup */
+  private _readyToCloseSelectOptions = false;
+
+  /** Timeout timer to close select options */
+  private _readyToCloseTimer: any;
+
   /** Observer to detect `disabled` status change of `controlElement` */
   private _mutationObserver?: MutationObserver;
+
+  /** Callback to cancel listening pointer up for select */
+  private _cancelListenPointerup?: () => void;
 
   constructor(
     @Inject(DOCUMENT) private readonly _document: Document,
@@ -95,6 +101,10 @@ export class FormFieldComponent implements AfterContentInit {
 
     // Sometimes, `disabled` status not detected when component initialized.
     this.disabled = !!this.controlElement?.disabled;
+  }
+
+  ngOnDestroy() {
+    clearTimeout(this._readyToCloseTimer);
   }
 
   /** Listen `click` event of host element to focus to control element */
@@ -137,9 +147,7 @@ export class FormFieldComponent implements AfterContentInit {
 
     if (controlContainer) {
       // Find target control element.
-      this.controlElement = controlContainer.nativeElement.querySelector(
-        'input, textarea, select',
-      );
+      this.controlElement = controlContainer.nativeElement.querySelector('input, textarea, select');
     }
   }
 
@@ -158,9 +166,42 @@ export class FormFieldComponent implements AfterContentInit {
       this._renderer.listen(this.controlElement, 'blur', () => {
         this.focused = false;
 
-        // Remove select opened status as well.
+        this._setSelectClosedWithDelay();
+      });
+    }
+  }
+
+  /** Mark selectOpened as closed after a delay to prevent instant opening on clicking form field */
+  private _setSelectClosedWithDelay(): void {
+    if (this._selectOpened) {
+      this._readyToCloseSelectOptions = true;
+
+      clearTimeout(this._readyToCloseTimer);
+
+      this._readyToCloseTimer = setTimeout(() => {
+        this._readyToCloseSelectOptions = false;
+      }, 1000);
+
+      this._cancelListenPointerup = this._renderer.listen(window, 'pointerup', () => this._windowPointerupListener());
+    }
+  }
+
+  /** Event listener for window:pointerup to close select options with delay */
+  private _windowPointerupListener(): void {
+    clearTimeout(this._readyToCloseTimer);
+
+    if (this._readyToCloseSelectOptions) {
+      setTimeout(() => {
         this._selectOpened = false;
       });
+    }
+
+    this._readyToCloseSelectOptions = false;
+
+    if (this._cancelListenPointerup) {
+      this._cancelListenPointerup();
+
+      delete this._cancelListenPointerup;
     }
   }
 
