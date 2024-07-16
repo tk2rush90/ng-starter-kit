@@ -14,6 +14,7 @@
 .flex-center-between {}
 .flex-center-end {}
 .flex-col-stretch {}
+.flex-col-center {}
 
 @layer base {
   .flex-center {
@@ -30,6 +31,10 @@
 
   .flex-col-stretch {
     @apply flex flex-col items-stretch;
+  }
+
+  .flex-col-center {
+    @apply flex flex-col items-center;
   }
 
   .app-icon {
