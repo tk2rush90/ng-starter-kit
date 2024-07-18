@@ -8,7 +8,8 @@ import { Account } from '../../../data/account';
 import { Profile } from '../../../data/profile';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Join } from '../../../data/join';
-import { JoinByGoogle } from '../../../data/join-by-google';
+import { GoogleIdToken } from '../../../data/google-id-token';
+import { DeletedAccount } from '../../../data/deleted-account';
 
 @Injectable({
   providedIn: 'root',
@@ -20,17 +21,23 @@ export class AuthService {
 
   logoutLoading$ = new BehaviorSubject(false);
 
+  deleteAccountLoading$ = new BehaviorSubject(false);
+
   joined = new EventEmitter<Account>();
 
   loggedIn = new EventEmitter<Profile>();
 
   loggedOut = new EventEmitter<void>();
 
+  accountDeleted = new EventEmitter<DeletedAccount>();
+
   joinFailed = new EventEmitter<HttpErrorResponse>();
 
   loginFailed = new EventEmitter<HttpErrorResponse>();
 
   logoutFailed = new EventEmitter<HttpErrorResponse>();
+
+  deleteAccountFailed = new EventEmitter<HttpErrorResponse>();
 
   signedProfile$ = new BehaviorSubject<Profile | null>(null);
 
@@ -39,6 +46,8 @@ export class AuthService {
   private _cancelLogin = new EventEmitter<void>();
 
   private _cancelLogout = new EventEmitter<void>();
+
+  private _cancelDeleteAccount = new EventEmitter<void>();
 
   constructor(private readonly _authApiService: AuthApiService) {}
 
@@ -74,6 +83,14 @@ export class AuthService {
     this.logoutLoading$.next(logoutLoading);
   }
 
+  get deleteAccountLoading(): boolean {
+    return this.deleteAccountLoading$.value;
+  }
+
+  set deleteAccountLoading(deleteAccountLoading: boolean) {
+    this.deleteAccountLoading$.next(deleteAccountLoading);
+  }
+
   get signedProfile(): Profile | null {
     return this.signedProfile$.value;
   }
@@ -82,6 +99,11 @@ export class AuthService {
     this.signedProfile$.next(signedProfile);
   }
 
+  /**
+   * Join.
+   * @param email
+   * @param nickname
+   */
   join({ email, nickname }: Join): void {
     if (this.joinLoading) {
       return;
@@ -99,6 +121,11 @@ export class AuthService {
       });
   }
 
+  /**
+   * Login.
+   * @param email
+   * @param otp
+   */
   login({ email, otp }: Login): void {
     if (this.loginLoading) {
       return;
@@ -116,6 +143,7 @@ export class AuthService {
       });
   }
 
+  /** Auto login */
   autoLogin(): void {
     if (this.loginLoading) {
       return;
@@ -133,6 +161,7 @@ export class AuthService {
       });
   }
 
+  /** Logout */
   logout(): void {
     if (this.logoutLoading) {
       return;
@@ -156,7 +185,11 @@ export class AuthService {
       });
   }
 
-  joinByGoogle({ idToken }: JoinByGoogle): void {
+  /**
+   * Join by Google.
+   * @param idToken
+   */
+  joinByGoogle({ idToken }: GoogleIdToken): void {
     if (this.joinLoading) {
       return;
     }
@@ -170,6 +203,49 @@ export class AuthService {
       .subscribe({
         next: (account) => this.joined.emit(account),
         error: (err: HttpErrorResponse) => this.joinFailed.emit(err),
+      });
+  }
+
+  /**
+   * Login by Google.
+   * @param idToken
+   */
+  loginByGoogle({ idToken }: GoogleIdToken): void {
+    if (this.loginLoading) {
+      return;
+    }
+
+    this.loginLoading = true;
+
+    this._authApiService
+      .loginByGoogle({ idToken })
+      .pipe(takeUntil(this._cancelLogin))
+      .pipe(finalize(() => (this.loginLoading = false)))
+      .subscribe({
+        next: (profile) => this._onLogin(profile),
+        error: (err: HttpErrorResponse) => this._onLoginFailed(err),
+      });
+  }
+
+  /** Delete account */
+  deleteAccount(): void {
+    if (this.deleteAccountLoading) {
+      return;
+    }
+
+    this.deleteAccountLoading = true;
+
+    this._authApiService
+      .deleteAccount()
+      .pipe(takeUntil(this._cancelDeleteAccount))
+      .pipe(finalize(() => (this.deleteAccountLoading = false)))
+      .subscribe({
+        next: (deletedAccount) => {
+          this.signedProfile = null;
+          this.accessToken = '';
+          this.accountDeleted.emit(deletedAccount);
+        },
+        error: (err: HttpErrorResponse) => this.deleteAccountFailed.emit(err),
       });
   }
 

@@ -1,4 +1,4 @@
-export interface JoinByGoogle {
+export interface GoogleIdToken {
   /** ID token from the Google authentication */
   idToken: string;
 }

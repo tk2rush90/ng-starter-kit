@@ -8,6 +8,10 @@ import { environment } from '../../../../environments/environment';
 export class OauthService {
   googleApiLoaded = new EventEmitter<void>();
 
+  googleAccountRevoked = new EventEmitter<void>();
+
+  revokeGoogleAccountFailed = new EventEmitter<void>();
+
   constructor(@Inject(DOCUMENT) private readonly _document: Document) {}
 
   addGoogleApiScript(): void {
@@ -35,5 +39,15 @@ export class OauthService {
 
   createGoogleButton(parent: HTMLElement, options: google.accounts.id.GsiButtonConfiguration): void {
     google.accounts.id.renderButton(parent, options);
+  }
+
+  revokeGoogleAuthentication(googleIdOrEmail: string): void {
+    google.accounts.id.revoke(googleIdOrEmail, (response) => {
+      if (response.successful) {
+        this.googleAccountRevoked.emit();
+      } else {
+        this.revokeGoogleAccountFailed.emit();
+      }
+    });
   }
 }
