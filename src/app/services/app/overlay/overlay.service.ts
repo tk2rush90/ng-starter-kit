@@ -1,16 +1,12 @@
-import {
-  ApplicationRef,
-  DestroyRef,
-  EmbeddedViewRef,
-  Injectable,
-  TemplateRef,
-  ViewContainerRef,
-} from '@angular/core';
+import { ApplicationRef, DestroyRef, EmbeddedViewRef, Injectable, TemplateRef, ViewContainerRef } from '@angular/core';
 import { OverlayOutletComponent } from '../../../components/common/overlay-outlet/overlay-outlet.component';
 import { NodeUtil } from '../../../utils/node-util';
 
 /** Options to open overlay */
 export interface OverlayOptions {
+  /** Any context to pass to overlay */
+  context?: any;
+
   /**
    * `DestroyRef` to destroy overlay on destroying component.
    *  When it's not provided, overlay only can be destroyed manually.
@@ -64,11 +60,8 @@ export class OverlayService {
    */
   get viewContainerRef(): ViewContainerRef {
     if (!this._cachedViewContainerRef) {
-      const rootViewContainerRef =
-        this._applicationRef.components[0].injector.get(ViewContainerRef);
-      const overlayOutletRef = rootViewContainerRef.createComponent(
-        OverlayOutletComponent,
-      );
+      const rootViewContainerRef = this._applicationRef.components[0].injector.get(ViewContainerRef);
+      const overlayOutletRef = rootViewContainerRef.createComponent(OverlayOutletComponent);
 
       overlayOutletRef.changeDetectorRef.detectChanges();
 
@@ -84,10 +77,7 @@ export class OverlayService {
    * @param options - Options to open overlay.
    * @return `EmbeddedViewRef` of rendered `TemplateRef`.
    */
-  open<C = any>(
-    templateRef: TemplateRef<C>,
-    options?: OverlayOptions,
-  ): OverlayRef<C> {
+  open<C = any>(templateRef: TemplateRef<C>, options?: OverlayOptions): OverlayRef<C> {
     // When duplication not allowed, return existing `OverlayRef` if found.
     if (!options?.allowDuplicated) {
       const duplicatedOverlayRef = this._openedOverlayRefs.find(
@@ -100,8 +90,7 @@ export class OverlayService {
     }
 
     // Create `EmbeddedView`.
-    const embeddedViewRef =
-      this.viewContainerRef.createEmbeddedView(templateRef);
+    const embeddedViewRef = this.viewContainerRef.createEmbeddedView(templateRef, options?.context);
 
     // Create `OverlayRef`.
     const overlayRef: OverlayRef<any> = {
@@ -117,8 +106,7 @@ export class OverlayService {
 
     embeddedViewRef.onDestroy(() => {
       this._openedOverlayRefs = this._openedOverlayRefs.filter(
-        (_openedOverlayRef) =>
-          _openedOverlayRef.embeddedViewRef !== embeddedViewRef,
+        (_openedOverlayRef) => _openedOverlayRef.embeddedViewRef !== embeddedViewRef,
       );
 
       if (options?.onDestroy) {
@@ -140,9 +128,7 @@ export class OverlayService {
   /** Close latest overlay. It cannot close OverlayRef that has `keyboardClosingPrevented` */
   closeLatest(): void {
     // Filter only closeable OverlayRefs.
-    const closeableOverlayRefs = this._openedOverlayRefs.filter(
-      (_overlayRef) => !_overlayRef.keyboardClosingPrevented,
-    );
+    const closeableOverlayRefs = this._openedOverlayRefs.filter((_overlayRef) => !_overlayRef.keyboardClosingPrevented);
 
     const latestOverlayRef = closeableOverlayRefs.pop();
 
@@ -177,8 +163,6 @@ export class OverlayService {
     overlayRef?.embeddedViewRef.destroy();
 
     // Remove `OverlayRef` from the list.
-    this._openedOverlayRefs = this._openedOverlayRefs.filter(
-      (_overlayRef) => _overlayRef !== overlayRef,
-    );
+    this._openedOverlayRefs = this._openedOverlayRefs.filter((_overlayRef) => _overlayRef !== overlayRef);
   }
 }
