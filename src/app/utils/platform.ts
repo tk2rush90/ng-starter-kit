@@ -1,4 +1,4 @@
-import UAParser, { IBrowser, IOS } from 'ua-parser-js';
+import UAParser, { IBrowser, IDevice, IOS } from 'ua-parser-js';
 import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 
 /** A class to detect about platform specification */
@@ -14,43 +14,42 @@ export class Platform {
     this._platformId = platformId;
   }
 
-  /**
-   * Get status whether platform is browser or not.
-   * @return Boolean status.
-   */
+  /** Get status whether platform is browser or not */
   static get isBrowser(): boolean {
     return isPlatformBrowser(this._platformId);
   }
 
-  /**
-   * Get status of whether platform is server or not.
-   * @return Boolean status.
-   */
+  /** Get status of whether platform is server or not */
   static get isServer(): boolean {
     return isPlatformServer(this._platformId);
   }
 
-  /**
-   * Get status of whether OS is created by Apple, inc. or not.
-   * @return Boolean status.
-   */
+  /** Get status of whether OS is created by Apple, inc. or not */
   static get isApple(): boolean {
     return this.os.name === 'iOS' || this.os.name === 'Mac OS';
   }
 
-  /**
-   * Get OS information from UA.
-   * @return OS information.
-   */
+  /** Get status of whether device is mobile or not */
+  static get isMobile(): boolean {
+    return this.device.type === 'mobile';
+  }
+
+  static get isTablet(): boolean {
+    return this.device.type === 'tablet';
+  }
+
+  /** Get OS information from UA */
   static get os(): IOS {
     return this._parser.getOS();
   }
 
-  /**
-   * Get browser information from UA.
-   * @return Browser information.
-   */
+  /** Get browser information from UA */
   static get browser(): IBrowser {
     return this._parser.getBrowser();
+  }
+
+  /** Get device information from UA */
+  static get device(): IDevice {
+    return this._parser.getDevice();
   }
 }
