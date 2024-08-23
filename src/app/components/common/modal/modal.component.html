@@ -1,1 +1,18 @@
+<!-- Close button -->
+@if (displayClose) {
+  <button
+    (click)="close()"
+    class="absolute top-4 right-4"
+    appIconButton>
+    <app-icon-x-mark class="size-4"></app-icon-x-mark>
+  </button>
+}
+
+<!-- Title container -->
+<div class="flex-center">
+  <div class="text-xl font-semibold">
+    {{ modalTitle }}
+  </div>
+</div>
+
 <ng-content></ng-content>
