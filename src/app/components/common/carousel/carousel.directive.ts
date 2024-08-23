@@ -80,36 +80,34 @@ export class CarouselDirective implements OnDestroy {
   }
 
   startSliding(event: MouseEvent | TouchEvent): void {
-    if (event.cancelable) {
-      event.preventDefault();
+    this.isSliding = true;
 
-      this.isSliding = true;
+    this.pause();
 
-      this.pause();
-
-      if (event instanceof MouseEvent) {
-        this.startX = event.x;
-      } else {
-        this.startX = event.touches[0].pageX;
-      }
-
-      this.movedX = this.startX;
+    if (event instanceof MouseEvent) {
+      this.startX = event.x;
+    } else {
+      this.startX = event.touches[0].pageX;
     }
+
+    this.movedX = this.startX;
   }
 
   moveSlide(event: MouseEvent | TouchEvent): void {
-    if (event.cancelable) {
-      event.preventDefault();
-    }
-
     if (this.isSliding) {
-      this.isSlided = true;
-
       if (event instanceof MouseEvent) {
         this.movedX = event.x;
       } else {
         this.movedX = event.touches[0].pageX;
       }
+
+      if (Math.abs(this.movedX - this.startX) > 5) {
+        this.isSlided = true;
+      }
+    }
+
+    if (this.isSlided && event.cancelable) {
+      event.preventDefault();
     }
 
     this.updateCarouselTransform();
@@ -171,7 +169,7 @@ export class CarouselDirective implements OnDestroy {
             this.animate(this.width * Math.floor(currentX));
           }
         } else {
-          this.animate(this.width * Math.ceil(currentX));
+          this.animate(this.width * -this.slideIndex);
         }
       }
     }
