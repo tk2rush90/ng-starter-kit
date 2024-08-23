@@ -41,6 +41,8 @@ export class AuthService {
 
   signedProfile$ = new BehaviorSubject<Profile | null>(null);
 
+  signChecked$ = new BehaviorSubject(false);
+
   private _cancelJoin = new EventEmitter<void>();
 
   private _cancelLogin = new EventEmitter<void>();
@@ -97,6 +99,14 @@ export class AuthService {
 
   set signedProfile(signedProfile: Profile | null) {
     this.signedProfile$.next(signedProfile);
+  }
+
+  get signChecked(): boolean {
+    return this.signChecked$.value;
+  }
+
+  set signChecked(value: boolean) {
+    this.signChecked$.next(value);
   }
 
   /**
@@ -252,6 +262,7 @@ export class AuthService {
   private _onLogin(profile: Profile): void {
     this.signedProfile = profile;
     this.accessToken = profile.accessToken;
+    this.signChecked = true;
     this.loggedIn.emit(profile);
   }
 
