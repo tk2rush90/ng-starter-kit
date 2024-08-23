@@ -1,5 +1,5 @@
 import { DestroyRef, EventEmitter, inject, Injectable } from '@angular/core';
-import { BehaviorSubject, finalize, Observable } from 'rxjs';
+import { BehaviorSubject, finalize, Observable, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -30,6 +30,14 @@ export abstract class CrudService<Data> {
   deleteFailed = new EventEmitter<HttpErrorResponse>();
 
   data$ = new BehaviorSubject<Data | null>(null);
+
+  private _cancelCreate = new EventEmitter<void>();
+
+  private _cancelFetch = new EventEmitter<void>();
+
+  private _cancelUpdate = new EventEmitter<void>();
+
+  private _cancelDelete = new EventEmitter<void>();
 
   protected readonly _destroyRef = inject(DestroyRef);
 
@@ -98,6 +106,7 @@ export abstract class CrudService<Data> {
 
     observable
       .pipe(takeUntilDestroyed(this._destroyRef))
+      .pipe(takeUntil(this._cancelCreate))
       .pipe(finalize(() => (this.createLoading = false)))
       .subscribe({
         next: (data) => this.created.emit(data),
@@ -114,6 +123,7 @@ export abstract class CrudService<Data> {
 
     observable
       .pipe(takeUntilDestroyed(this._destroyRef))
+      .pipe(takeUntil(this._cancelFetch))
       .pipe(finalize(() => (this.fetchLoading = false)))
       .subscribe({
         next: (data) => this.fetched.emit(data),
@@ -130,6 +140,7 @@ export abstract class CrudService<Data> {
 
     observable
       .pipe(takeUntilDestroyed(this._destroyRef))
+      .pipe(takeUntil(this._cancelUpdate))
       .pipe(finalize(() => (this.updateLoading = false)))
       .subscribe({
         next: (data) => this.updated.emit(data),
@@ -146,10 +157,27 @@ export abstract class CrudService<Data> {
 
     observable
       .pipe(takeUntilDestroyed(this._destroyRef))
+      .pipe(takeUntil(this._cancelDelete))
       .pipe(finalize(() => (this.deleteLoading = false)))
       .subscribe({
         next: (data) => this.deleted.emit(data),
         error: (err: HttpErrorResponse) => this.deleteFailed.emit(err),
       });
+  }
+
+  cancelCreate(): void {
+    this._cancelCreate.emit();
+  }
+
+  cancelFetch(): void {
+    this._cancelFetch.emit();
+  }
+
+  cancelUpdate(): void {
+    this._cancelUpdate.emit();
+  }
+
+  cancelDelete(): void {
+    this._cancelDelete.emit();
   }
 }

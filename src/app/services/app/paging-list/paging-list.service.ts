@@ -1,5 +1,5 @@
 import { DestroyRef, EventEmitter, inject, Injectable } from '@angular/core';
-import { BehaviorSubject, finalize, Observable } from 'rxjs';
+import { BehaviorSubject, finalize, Observable, takeUntil } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
 import { PagingResult } from '../../../data/paging-result';
@@ -19,6 +19,8 @@ export abstract class PagingListService<Data> {
   fetchedOnce$ = new BehaviorSubject(false);
 
   protected readonly _destroyRef = inject(DestroyRef);
+
+  private _cancelFetch = new EventEmitter<void>();
 
   get fetchLoading(): boolean {
     return this.fetchLoading$.value;
@@ -65,6 +67,7 @@ export abstract class PagingListService<Data> {
 
     observable
       .pipe(takeUntilDestroyed(this._destroyRef))
+      .pipe(takeUntil(this._cancelFetch))
       .pipe(finalize(() => (this.fetchLoading = false)))
       .subscribe({
         next: (result) => {
@@ -75,5 +78,9 @@ export abstract class PagingListService<Data> {
         },
         error: (err: HttpErrorResponse) => this.fetchFailed.emit(err),
       });
+  }
+
+  cancelFetch(): void {
+    this._cancelFetch.emit();
   }
 }
