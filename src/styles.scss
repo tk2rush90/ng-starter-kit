@@ -24,6 +24,8 @@
 .x-extendable-auto {}
 .y-non-extendable {}
 .x-non-extendable {}
+.flat-button {}
+.stroke-button {}
 
 @layer base {
   .flex-center {
@@ -80,6 +82,61 @@
 
   .x-non-extendable {
     @apply grow-0 shrink-0 w-auto basis-auto;
+  }
+
+  .flat-button {
+    @apply
+    inline-flex
+    items-center
+    justify-center
+    rounded-full
+    text-white
+    bg-primary-500
+    px-3
+    sm:px-4
+    h-8
+    sm:h-10
+    hover:brightness-95
+    active:brightness-90
+    active:outline
+    active:outline-3
+    active:outline-amber-500/50
+    focus:outline
+    focus:outline-3
+    focus:outline-amber-500/50
+    disabled:bg-neutral-100
+    disabled:text-neutral-400;
+
+    &.error {
+      @apply
+      bg-error-500
+      active:outline-error-500/50
+      focus:outline-error-500/50
+    }
+  }
+
+  .stroke-button {
+    @apply
+    inline-flex
+    items-center
+    justify-center
+    rounded-full
+    px-3
+    sm:px-4
+    h-8
+    sm:h-10
+    border
+    border-neutral-400
+    hover:backdrop-brightness-95
+    active:backdrop-brightness-90
+    active:outline
+    active:outline-3
+    active:outline-neutral-600/30
+    focus:outline
+    focus:outline-3
+    focus:outline-neutral-600/30
+    disabled:bg-neutral-100
+    disabled:text-neutral-400;
   }
 
   .app-icon {
