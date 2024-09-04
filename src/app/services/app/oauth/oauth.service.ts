@@ -1,53 +1,48 @@
-import { EventEmitter, Inject, Injectable } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
+import { GoogleRedirectOptions } from '../../../data/google-redirect-options';
 
 @Injectable({
   providedIn: 'root',
 })
 export class OauthService {
-  googleApiLoaded = new EventEmitter<void>();
+  getGoogleAccessToken({
+    clientId,
+    redirectUri,
+    scope = ['email', 'profile'],
+    prompt,
+    state,
+    includeGrantedScopes,
+    enableGranularConsent,
+    loginHint,
+  }: GoogleRedirectOptions): void {
+    const url = new URL(environment.host.googleOauth2 + '/auth');
 
-  googleAccountRevoked = new EventEmitter<void>();
+    url.searchParams.set('client_id', clientId);
+    url.searchParams.set('redirect_uri', redirectUri);
+    url.searchParams.set('response_type', 'token');
+    url.searchParams.set('scope', scope.join(' '));
 
-  revokeGoogleAccountFailed = new EventEmitter<void>();
+    if (prompt !== undefined) {
+      url.searchParams.set('prompt', prompt);
+    }
 
-  constructor(@Inject(DOCUMENT) private readonly _document: Document) {}
+    if (includeGrantedScopes !== undefined) {
+      url.searchParams.set('include_granted_scopes', String(includeGrantedScopes));
+    }
 
-  addGoogleApiScript(): void {
-    const script = this._document.createElement('script');
+    if (enableGranularConsent !== undefined) {
+      url.searchParams.set('enable_granular_consent', String(enableGranularConsent));
+    }
 
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.addEventListener('load', () => {
-      this.googleApiLoaded.emit();
-    });
+    if (loginHint !== undefined) {
+      url.searchParams.set('login_hint', loginHint);
+    }
 
-    this._document.body.appendChild(script);
-  }
+    if (state !== undefined) {
+      url.searchParams.set('state', state);
+    }
 
-  initializeGoogleApi(options: Partial<google.accounts.id.IdConfiguration> = {}): void {
-    google.accounts.id.initialize({
-      client_id: environment.google.clientId,
-      ...options,
-    });
-  }
-
-  openGoogleOneTap(): void {
-    google.accounts.id.prompt();
-  }
-
-  createGoogleButton(parent: HTMLElement, options: google.accounts.id.GsiButtonConfiguration): void {
-    google.accounts.id.renderButton(parent, options);
-  }
-
-  revokeGoogleAuthentication(googleIdOrEmail: string): void {
-    google.accounts.id.revoke(googleIdOrEmail, (response) => {
-      if (response.successful) {
-        this.googleAccountRevoked.emit();
-      } else {
-        this.revokeGoogleAccountFailed.emit();
-      }
-    });
+    location.href = url.toString();
   }
 }

@@ -8,7 +8,6 @@ import { Account } from '../../../data/account';
 import { Profile } from '../../../data/profile';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Join } from '../../../data/join';
-import { GoogleIdToken } from '../../../data/google-id-token';
 import { DeletedAccount } from '../../../data/deleted-account';
 
 @Injectable({
@@ -195,32 +194,7 @@ export class AuthService {
       });
   }
 
-  /**
-   * Join by Google.
-   * @param idToken
-   */
-  joinByGoogle({ idToken }: GoogleIdToken): void {
-    if (this.joinLoading) {
-      return;
-    }
-
-    this.joinLoading = true;
-
-    this._authApiService
-      .joinByGoogle({ idToken })
-      .pipe(takeUntil(this._cancelJoin))
-      .pipe(finalize(() => (this.joinLoading = false)))
-      .subscribe({
-        next: (account) => this.joined.emit(account),
-        error: (err: HttpErrorResponse) => this.joinFailed.emit(err),
-      });
-  }
-
-  /**
-   * Login by Google.
-   * @param idToken
-   */
-  loginByGoogle({ idToken }: GoogleIdToken): void {
+  startByGoogle(accessToken: string): void {
     if (this.loginLoading) {
       return;
     }
@@ -228,7 +202,7 @@ export class AuthService {
     this.loginLoading = true;
 
     this._authApiService
-      .loginByGoogle({ idToken })
+      .startByGoogle(accessToken)
       .pipe(takeUntil(this._cancelLogin))
       .pipe(finalize(() => (this.loginLoading = false)))
       .subscribe({

@@ -14,6 +14,9 @@
 .flex-center-between {}
 .flex-center-end {}
 .flex-center-start {}
+.flex-start-start {}
+.flex-start-end {}
+.flex-start-between {}
 .flex-col-stretch {}
 .flex-col-center {}
 .flex-col-end {}
@@ -42,6 +45,18 @@
 
   .flex-center-start {
     @apply flex items-center justify-start flex-row;
+  }
+
+  .flex-start-start {
+    @apply flex items-start justify-around flex-row;
+  }
+
+  .flex-start-end {
+    @apply flex items-start justify-end flex-row;
+  }
+
+  .flex-start-between {
+    @apply flex items-start justify-between flex-row;
   }
 
   .flex-col-stretch {
@@ -84,59 +99,105 @@
     @apply grow-0 shrink-0 w-auto basis-auto;
   }
 
-  .flat-button {
+  .base-button {
     @apply
-    inline-flex
-    items-center
-    justify-center
-    rounded-full
-    text-white
-    bg-primary-500
-    px-3
-    sm:px-4
-    h-8
-    sm:h-10
-    hover:brightness-95
-    active:brightness-90
-    active:outline
-    active:outline-3
-    active:outline-amber-500/50
-    focus:outline
-    focus:outline-3
-    focus:outline-amber-500/50
-    disabled:bg-neutral-100
-    disabled:text-neutral-400;
+      inline-flex
+      items-center
+      justify-center
+      rounded-full
+      px-3
+      xs:px-4
+      h-8
+      xs:h-10
+      text-sm
+      xs:text-base
+      disabled:bg-neutral-100
+      disabled:text-neutral-400
+      disabled:border-none
+      outline-transparent
+      active:outline
+      active:outline-3
+      focus:outline
+      focus:outline-3
+      transition-all;
+  }
+
+  .flat-button {
+    @apply base-button
+      text-white
+      hover:brightness-95
+      active:brightness-90;
+
+    &.primary {
+      @apply bg-primary-400
+        active:outline-primary-400/50
+        focus:outline-primary-400/50;
+    }
+
+    &.secondary {
+      @apply bg-secondary-500
+        active:outline-secondary-500/50
+        focus:outline-secondary-500/50;
+    }
+
+    &.tertiary {
+      @apply bg-tertiary-500
+        active:outline-tertiary-500/50
+        focus:outline-tertiary-500/50;
+    }
+
+    &.warn {
+      @apply bg-warn-500
+        active:outline-warn-500/50
+        focus:outline-warn-500/50;
+    }
 
     &.error {
-      @apply
-      bg-error-500
-      active:outline-error-500/50
-      focus:outline-error-500/50
+      @apply bg-error-500
+        active:outline-error-500/50
+        focus:outline-error-500/50;
+    }
+
+    &.success {
+      @apply bg-success-500
+        active:outline-success-500/50
+        focus:outline-success-500/50;
     }
   }
 
   .stroke-button {
-    @apply
-    inline-flex
-    items-center
-    justify-center
-    rounded-full
-    px-3
-    sm:px-4
-    h-8
-    sm:h-10
-    border
-    border-neutral-400
-    hover:backdrop-brightness-95
-    active:backdrop-brightness-90
-    active:outline
-    active:outline-3
-    active:outline-neutral-600/30
-    focus:outline
-    focus:outline-3
-    focus:outline-neutral-600/30
-    disabled:bg-neutral-100
-    disabled:text-neutral-400;
+    @apply base-button
+      border
+      border-black/[0.07]
+      text-black
+      hover:backdrop-brightness-95
+      active:backdrop-brightness-90
+      active:outline-neutral-400/30
+      focus:outline-neutral-400/30;
+
+    &.primary {
+      @apply text-primary-400;
+    }
+
+    &.secondary {
+      @apply text-secondary-500;
+    }
+
+    &.tertiary {
+      @apply text-tertiary-500;
+    }
+
+    &.warn {
+      @apply text-warn-500;
+    }
+
+    &.error {
+      @apply text-error-500;
+    }
+
+    &.success {
+      @apply text-success-500;
+    }
   }
 
   .app-icon {

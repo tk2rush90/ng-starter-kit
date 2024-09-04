@@ -17,6 +17,9 @@
         },
         "@schematics/angular:pipe": {
           "flat": false
+        },
+        "@schematics/angular:guard": {
+          "flat": false
         }
       },
       "root": "",
@@ -37,7 +40,8 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/fonts"
+              "src/fonts",
+              "src/.well-known"
             ],
             "styles": [
               "src/styles.scss",
@@ -45,10 +49,11 @@
             ],
             "scripts": [],
             "server": "src/main.server.ts",
-            "prerender": true,
+            "prerender": false,
             "ssr": {
               "entry": "server.ts"
-            }
+            },
+            "allowedCommonJsDependencies": ["ua-parser-js"]
           },
           "configurations": {
             "production": {

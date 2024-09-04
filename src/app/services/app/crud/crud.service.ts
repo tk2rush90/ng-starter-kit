@@ -126,7 +126,10 @@ export abstract class CrudService<Data> {
       .pipe(takeUntil(this._cancelFetch))
       .pipe(finalize(() => (this.fetchLoading = false)))
       .subscribe({
-        next: (data) => this.fetched.emit(data),
+        next: (data) => {
+          this.data = data;
+          this.fetched.emit(data);
+        },
         error: (err: HttpErrorResponse) => this.fetchFailed.emit(err),
       });
   }

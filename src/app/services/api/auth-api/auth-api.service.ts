@@ -9,7 +9,6 @@ import { Profile } from '../../../data/profile';
 import { Email } from '../../../data/email';
 import { HttpParams } from '@angular/common/http';
 import { Nickname } from '../../../data/nickname';
-import { GoogleIdToken } from '../../../data/google-id-token';
 import { DeletedAccount } from '../../../data/deleted-account';
 
 @Injectable({
@@ -82,23 +81,9 @@ export class AuthApiService extends ApiService {
     return this._http.post<void>(this.host + '/logout', {});
   }
 
-  /**
-   * Join by google.
-   * @param idToken
-   */
-  joinByGoogle({ idToken }: GoogleIdToken): Observable<Account> {
-    return this._http.post<Account>(this.host + '/join/google', {
-      idToken,
-    });
-  }
-
-  /**
-   * Login by google.
-   * @param idToken
-   */
-  loginByGoogle({ idToken }: GoogleIdToken): Observable<Profile> {
-    return this._http.post<Profile>(this.host + '/login/google', {
-      idToken,
+  startByGoogle(accessToken: string): Observable<Profile> {
+    return this._http.post<Profile>(this.host + '/start/google', {
+      accessToken,
     });
   }
 
