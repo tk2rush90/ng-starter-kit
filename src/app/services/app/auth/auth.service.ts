@@ -2,19 +2,16 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { AuthApiService } from '../../api/auth-api/auth-api.service';
 import { LocalStorageUtil } from '../../../utils/local-storage-util';
 import { ACCESS_TOKEN_KEY } from '../../../constants/storage-keys';
-import { Login } from '../../../data/login';
 import { BehaviorSubject, finalize, takeUntil } from 'rxjs';
-import { Account } from '../../../data/account';
 import { Profile } from '../../../data/profile';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Join } from '../../../data/join';
 import { DeletedAccount } from '../../../data/deleted-account';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  joinLoading$ = new BehaviorSubject(false);
+  startLoading$ = new BehaviorSubject(false);
 
   loginLoading$ = new BehaviorSubject(false);
 
@@ -22,7 +19,7 @@ export class AuthService {
 
   deleteAccountLoading$ = new BehaviorSubject(false);
 
-  joined = new EventEmitter<Account>();
+  started = new EventEmitter<Profile>();
 
   loggedIn = new EventEmitter<Profile>();
 
@@ -30,7 +27,7 @@ export class AuthService {
 
   accountDeleted = new EventEmitter<DeletedAccount>();
 
-  joinFailed = new EventEmitter<HttpErrorResponse>();
+  startFailed = new EventEmitter<HttpErrorResponse>();
 
   loginFailed = new EventEmitter<HttpErrorResponse>();
 
@@ -42,7 +39,7 @@ export class AuthService {
 
   signChecked$ = new BehaviorSubject(false);
 
-  private _cancelJoin = new EventEmitter<void>();
+  private _cancelStart = new EventEmitter<void>();
 
   private _cancelLogin = new EventEmitter<void>();
 
@@ -60,12 +57,12 @@ export class AuthService {
     LocalStorageUtil.set(ACCESS_TOKEN_KEY, accessToken);
   }
 
-  get joinLoading(): boolean {
-    return this.joinLoading$.value;
+  get startLoading(): boolean {
+    return this.startLoading$.value;
   }
 
-  set joinLoading(joinLoading: boolean) {
-    this.joinLoading$.next(joinLoading);
+  set startLoading(startLoading: boolean) {
+    this.startLoading$.next(startLoading);
   }
 
   get loginLoading(): boolean {
@@ -106,50 +103,6 @@ export class AuthService {
 
   set signChecked(value: boolean) {
     this.signChecked$.next(value);
-  }
-
-  /**
-   * Join.
-   * @param email
-   * @param nickname
-   */
-  join({ email, nickname }: Join): void {
-    if (this.joinLoading) {
-      return;
-    }
-
-    this.joinLoading = true;
-
-    this._authApiService
-      .join({ email, nickname })
-      .pipe(takeUntil(this._cancelJoin))
-      .pipe(finalize(() => (this.joinLoading = false)))
-      .subscribe({
-        next: (account) => this.joined.emit(account),
-        error: (err: HttpErrorResponse) => this.joinFailed.emit(err),
-      });
-  }
-
-  /**
-   * Login.
-   * @param email
-   * @param otp
-   */
-  login({ email, otp }: Login): void {
-    if (this.loginLoading) {
-      return;
-    }
-
-    this.loginLoading = true;
-
-    this._authApiService
-      .login({ email, otp })
-      .pipe(takeUntil(this._cancelLogin))
-      .pipe(finalize(() => (this.loginLoading = false)))
-      .subscribe({
-        next: (profile) => this._onLogin(profile),
-        error: (err: HttpErrorResponse) => this._onLoginFailed(err),
-      });
   }
 
   /** Auto login */
@@ -195,19 +148,28 @@ export class AuthService {
   }
 
   startByGoogle(accessToken: string): void {
-    if (this.loginLoading) {
+    if (this.startLoading) {
       return;
     }
 
-    this.loginLoading = true;
+    this.startLoading = true;
 
     this._authApiService
       .startByGoogle(accessToken)
-      .pipe(takeUntil(this._cancelLogin))
-      .pipe(finalize(() => (this.loginLoading = false)))
+      .pipe(takeUntil(this._cancelStart))
+      .pipe(finalize(() => (this.startLoading = false)))
       .subscribe({
-        next: (profile) => this._onLogin(profile),
-        error: (err: HttpErrorResponse) => this._onLoginFailed(err),
+        next: (profile) => {
+          this.signedProfile = profile;
+          this.accessToken = profile.accessToken;
+          this.signChecked = true;
+          this.started.emit();
+        },
+        error: (err: HttpErrorResponse) => {
+          this.signedProfile = null;
+          this.accessToken = '';
+          this.startFailed.emit(err);
+        },
       });
   }
 
@@ -246,8 +208,8 @@ export class AuthService {
     this.loginFailed.emit(err);
   }
 
-  cancelJoin(): void {
-    this._cancelJoin.emit();
+  cancelStart(): void {
+    this._cancelStart.emit();
   }
 
   cancelLogin(): void {
