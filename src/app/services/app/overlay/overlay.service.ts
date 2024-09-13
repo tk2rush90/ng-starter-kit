@@ -1,6 +1,15 @@
-import { ApplicationRef, DestroyRef, EmbeddedViewRef, Injectable, TemplateRef, ViewContainerRef } from '@angular/core';
+import {
+  ApplicationRef,
+  DestroyRef,
+  EmbeddedViewRef,
+  Injectable,
+  Injector,
+  TemplateRef,
+  ViewContainerRef,
+} from '@angular/core';
 import { OverlayOutletComponent } from '../../../components/common/overlay-outlet/overlay-outlet.component';
-import { NodeUtil } from '../../../utils/node-util';
+import { Platform } from '../../../utils/platform';
+import { OVERLAY_REF } from '../../../tokens/overlay-ref';
 
 /** Options to open overlay */
 export interface OverlayOptions {
@@ -19,20 +28,29 @@ export interface OverlayOptions {
   /** Set to allow opening duplicated template at once */
   allowDuplicated?: boolean;
 
+  /** Set to prevent closing on click outside */
+  preventOutsideClosing?: boolean;
+
   /** Set to prevent closing overlay by Escape key */
   preventKeyboardClosing?: boolean;
 }
 
 /** Reference of opened overlay */
-export interface OverlayRef<C> {
+export interface OverlayRef<C = any> {
   /** Rendered `EmbeddedViewRef` of overlay */
-  embeddedViewRef: EmbeddedViewRef<C>;
+  embeddedViewRef?: EmbeddedViewRef<C>;
 
   /** Original `TemplateRef` of overlay */
   templateRef: TemplateRef<C>;
 
   /** Keyboard closing prevented status */
   keyboardClosingPrevented: boolean;
+
+  /** Outside closing prevented status */
+  outsideClosingPrevented: boolean;
+
+  /** Overlay ready status. Outside closing works after ready*/
+  ready: boolean;
 
   /** Close overlay */
   close: () => void;
@@ -44,7 +62,7 @@ export interface OverlayRef<C> {
 })
 export class OverlayService {
   /** Opened overlays */
-  private _openedOverlayRefs: OverlayRef<any>[] = [];
+  private _openedOverlayRefs: OverlayRef[] = [];
 
   /**
    * By default, opening an overlay will create viewContainerRef to render overlay.
@@ -52,7 +70,39 @@ export class OverlayService {
    */
   private _cachedViewContainerRef?: ViewContainerRef;
 
-  constructor(private readonly _applicationRef: ApplicationRef) {}
+  constructor(private readonly _applicationRef: ApplicationRef) {
+    if (Platform.isBrowser) {
+      // close on outside clicking
+      window.addEventListener(
+        'click',
+        (event) => {
+          if (event.target instanceof HTMLElement) {
+            const target = event.target;
+
+            this._openedOverlayRefs.forEach((_overlayRef) => {
+              if (!_overlayRef.outsideClosingPrevented && _overlayRef.ready) {
+                const clickableRootNodes: HTMLElement[] =
+                  _overlayRef.embeddedViewRef?.rootNodes.filter(
+                    (_rootNode) =>
+                      _rootNode instanceof HTMLElement &&
+                      getComputedStyle(_rootNode).getPropertyValue('pointer-events') !== 'none',
+                  ) || [];
+
+                if (clickableRootNodes.some((_node) => _node.contains(target))) {
+                  return;
+                } else {
+                  _overlayRef.close();
+                }
+              }
+            });
+          }
+        },
+        {
+          capture: true,
+        },
+      );
+    }
+  }
 
   /**
    * Get `ViewContainerRef` to render overlays.
@@ -89,18 +139,30 @@ export class OverlayService {
       }
     }
 
-    // Create `EmbeddedView`.
-    const embeddedViewRef = this.viewContainerRef.createEmbeddedView(templateRef, options?.context);
-
     // Create `OverlayRef`.
-    const overlayRef: OverlayRef<any> = {
-      embeddedViewRef,
+    const overlayRef: OverlayRef = {
       templateRef,
       keyboardClosingPrevented: !!options?.preventKeyboardClosing,
+      outsideClosingPrevented: !!options?.preventOutsideClosing,
+      ready: false,
       close: () => {
         this.close(overlayRef);
       },
     };
+
+    // Create `EmbeddedView`.
+    const embeddedViewRef = this.viewContainerRef.createEmbeddedView(templateRef, options?.context, {
+      injector: Injector.create({
+        providers: [
+          {
+            provide: OVERLAY_REF,
+            useValue: overlayRef,
+          },
+        ],
+      }),
+    });
+
+    overlayRef.embeddedViewRef = embeddedViewRef;
 
     this._openedOverlayRefs.push(overlayRef);
 
@@ -121,6 +183,9 @@ export class OverlayService {
       });
     }
 
+    // To prevent closing instantly, set ready status after timeout
+    setTimeout(() => (overlayRef.ready = true));
+
     // Return created `OverlayRef`.
     return overlayRef;
   }
@@ -133,34 +198,16 @@ export class OverlayService {
     const latestOverlayRef = closeableOverlayRefs.pop();
 
     // `latestOverlayRef` will be removed from the `_openedOverlayRefs` when the `onDestroy()` method run.
-    latestOverlayRef?.embeddedViewRef.destroy();
-  }
-
-  /**
-   * Close an overlay that contains provided `element` as a child.
-   * If overlay not found, it does nothing.
-   * @param element - `HTMLElement` to find `OverlayRef`.
-   */
-  closeByElement(element: HTMLElement): void {
-    // Find target `OverlayRef` that contains `element` as a child.
-    const targetOverlayRef = this._openedOverlayRefs.find((_overlayRef) => {
-      return _overlayRef.embeddedViewRef.rootNodes.some((_node) => {
-        return _node === element || NodeUtil.containsTargetNode(_node, element);
-      });
-    });
-
-    if (targetOverlayRef) {
-      this.close(targetOverlayRef);
-    }
+    latestOverlayRef?.embeddedViewRef?.destroy();
   }
 
   /**
    * Close OverlayRef.
    * @param overlayRef - OverlayRef to close.
    */
-  close(overlayRef: OverlayRef<any>): void {
+  close(overlayRef: OverlayRef): void {
     // Destroy rendered `EmbeddedViewRef` of found target.
-    overlayRef?.embeddedViewRef.destroy();
+    overlayRef?.embeddedViewRef?.destroy();
 
     // Remove `OverlayRef` from the list.
     this._openedOverlayRefs = this._openedOverlayRefs.filter((_overlayRef) => _overlayRef !== overlayRef);

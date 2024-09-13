@@ -32,10 +32,7 @@ import { IconFormatStrikethroughComponent } from '../../icons/icon-format-strike
 import { IconQuestionMarkCircleComponent } from '../../icons/icon-question-mark-circle/icon-question-mark-circle.component';
 import { BackdropComponent } from '../backdrop/backdrop.component';
 import { ModalComponent } from '../modal/modal.component';
-import {
-  OverlayRef,
-  OverlayService,
-} from '../../../services/app/overlay/overlay.service';
+import { OverlayRef, OverlayService } from '../../../services/app/overlay/overlay.service';
 import { IconXMarkComponent } from '../../icons/icon-x-mark/icon-x-mark.component';
 import { IconSyncAltComponent } from '../../icons/icon-sync-alt/icon-sync-alt.component';
 import { IconSyncComponent } from '../../icons/icon-sync/icon-sync.component';
@@ -121,7 +118,7 @@ export class MarkdownEditorComponent implements OnInit {
   guideTemplateRef?: TemplateRef<any>;
 
   /** OverlayRef of guide modal */
-  guideOverlayRef?: OverlayRef<any>;
+  guideOverlayRef?: OverlayRef;
 
   /** View type of markdown editor */
   viewType: MarkdownEditorViewType = 'mirror';
@@ -142,21 +139,11 @@ export class MarkdownEditorComponent implements OnInit {
   exampleItalic = this._markdownService.render('_기울기_');
   exampleStrike = this._markdownService.render('~~취소선~~');
   exampleInlineCode = this._markdownService.render('`code`');
-  exampleOrderedList = this._markdownService.render(
-    '1. 첫 번째\n1. 두 번째\n1. 세 번째',
-  );
-  exampleUnorderedList = this._markdownService.render(
-    '- 첫 번째\n- 두 번째\n- 세 번째',
-  );
-  exampleQuote = this._markdownService.render(
-    '> 일찍 일어나는 새가\n> 벌레를 잡는다',
-  );
-  exampleImage = this._markdownService.render(
-    '![대체 텍스트](https://picsum.photos/id/1/50/50)',
-  );
-  exampleLink = this._markdownService.render(
-    '[링크 텍스트](https://google.com)',
-  );
+  exampleOrderedList = this._markdownService.render('1. 첫 번째\n1. 두 번째\n1. 세 번째');
+  exampleUnorderedList = this._markdownService.render('- 첫 번째\n- 두 번째\n- 세 번째');
+  exampleQuote = this._markdownService.render('> 일찍 일어나는 새가\n> 벌레를 잡는다');
+  exampleImage = this._markdownService.render('![대체 텍스트](https://picsum.photos/id/1/50/50)');
+  exampleLink = this._markdownService.render('[링크 텍스트](https://google.com)');
 
   /** Logger */
   private readonly _logger = new Logger('MarkdownEditorComponent');
@@ -289,11 +276,7 @@ export class MarkdownEditorComponent implements OnInit {
 
   /** Sync scroll position between editor and preview */
   syncScrollPosition(): void {
-    if (
-      this.markdownTextareaElementRef &&
-      this.previewContainerElementRef &&
-      this.scrollSynced
-    ) {
+    if (this.markdownTextareaElementRef && this.previewContainerElementRef && this.scrollSynced) {
       const availableTotalScrollTopOfPreviewContainer =
         this.previewContainerElementRef.nativeElement.scrollHeight -
         this.previewContainerElementRef.nativeElement.offsetHeight;
@@ -303,17 +286,10 @@ export class MarkdownEditorComponent implements OnInit {
         this.markdownTextareaElementRef.nativeElement.offsetHeight;
 
       const scrolledTopInRatio =
-        this.markdownTextareaElementRef.nativeElement.scrollTop /
-        availableTotalScrollTopOfMarkdownTextarea;
+        this.markdownTextareaElementRef.nativeElement.scrollTop / availableTotalScrollTopOfMarkdownTextarea;
 
-      this._logger.log(
-        'availableTotalScrollTopOfPreviewContainer: ' +
-          availableTotalScrollTopOfPreviewContainer,
-      );
-      this._logger.log(
-        'availableTotalScrollTopOfMarkdownTextarea: ' +
-          availableTotalScrollTopOfMarkdownTextarea,
-      );
+      this._logger.log('availableTotalScrollTopOfPreviewContainer: ' + availableTotalScrollTopOfPreviewContainer);
+      this._logger.log('availableTotalScrollTopOfMarkdownTextarea: ' + availableTotalScrollTopOfMarkdownTextarea);
       this._logger.log('scrolledTopInRatio: ' + scrolledTopInRatio);
 
       this.previewContainerElementRef.nativeElement.scrollTo({

@@ -1,10 +1,10 @@
-import { AfterContentInit, booleanAttribute, Component, ElementRef, Input, OnDestroy } from '@angular/core';
+import { booleanAttribute, Component, Inject, Input } from '@angular/core';
 import { fadeInOut } from '../../../animations/fade-in-out';
-import { ClickDetectorService } from '../../../services/app/click-detector/click-detector.service';
-import { OverlayService } from '../../../services/app/overlay/overlay.service';
+import { OverlayRef } from '../../../services/app/overlay/overlay.service';
 import { scaleUpDown } from '../../../animations/scale-up-down';
 import { IconButtonDirective } from '../icon-button/icon-button.directive';
 import { IconXMarkComponent } from '../../icons/icon-x-mark/icon-x-mark.component';
+import { OVERLAY_REF } from '../../../tokens/overlay-ref';
 
 /** A modal container */
 @Component({
@@ -15,7 +15,7 @@ import { IconXMarkComponent } from '../../icons/icon-x-mark/icon-x-mark.componen
   styleUrl: './modal.component.scss',
   host: {
     'class':
-      'fixed bg-white rounded-2xl p-6 flex-col-stretch gap-5 shadow-lg top-1/2 left-1/2 pointer-events-auto max-h-[calc(100vh-32px)] overflow-auto w-full max-w-screen-xs',
+      'fixed bg-white rounded-2xl p-6 flex-col-stretch gap-5 shadow-lg top-1/2 left-1/2 pointer-events-auto max-h-[calc(100vh-32px)] overflow-auto w-[calc(100%-32px)]',
     // To bind `transform` animation or TailwindCSS classes, use `translate` attribute.
     '[style.translate]': `'-50% -50%'`,
     '[@modalFadeInOut]': '',
@@ -23,39 +23,17 @@ import { IconXMarkComponent } from '../../icons/icon-x-mark/icon-x-mark.componen
   },
   animations: [fadeInOut('modalFadeInOut'), scaleUpDown('modalScaleUpDown')],
 })
-export class ModalComponent implements AfterContentInit, OnDestroy {
+export class ModalComponent {
   /** Set modal title */
   @Input() modalTitle = '';
-
-  /** Set to keep opening on outside click */
-  @Input({ transform: booleanAttribute }) keepOnOutsideClick = false;
 
   /** Set to display close button */
   @Input({ transform: booleanAttribute }) displayClose = false;
 
-  constructor(
-    private readonly _elementRef: ElementRef<HTMLElement>,
-    private readonly _overlayService: OverlayService,
-    private readonly _clickDetectorService: ClickDetectorService,
-  ) {}
-
-  ngAfterContentInit() {
-    // When outside is clicked, close modal. It only works when `keepOnOutsideClick` is `false`.
-    this._clickDetectorService.detectClick(this._elementRef.nativeElement, {
-      onOutsideClick: () => {
-        if (!this.keepOnOutsideClick) {
-          this._overlayService.closeByElement(this._elementRef.nativeElement);
-        }
-      },
-    });
-  }
-
-  ngOnDestroy() {
-    this._clickDetectorService.cancelDetect(this._elementRef.nativeElement);
-  }
+  constructor(@Inject(OVERLAY_REF) private readonly _overlayRef: OverlayRef) {}
 
   /** Close modal */
   close(): void {
-    this._overlayService.closeByElement(this._elementRef.nativeElement);
+    this._overlayRef.close();
   }
 }
