@@ -16,6 +16,8 @@ module.exports = {
         'lg': '1024px',
         'xl': '1280px',
         '2xl': '1440px',
+        '3xl': '1600px',
+        '4xl': '1920px',
       },
       // Generate colors from https://uicolors.app/create is recommended.
       colors: {
@@ -29,7 +31,17 @@ module.exports = {
       outlineWidth: {
         3: '3px',
       },
+      containers: {
+        'xs': '375px',
+        'sm': '425px',
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1280px',
+        '2xl': '1440px',
+        '3xl': '1600px',
+        '4xl': '1920px',
+      },
     },
   },
-  plugins: [require('@tailwindcss/typography')],
+  plugins: [require('@tailwindcss/typography'), require('@tailwindcss/container-queries')],
 };
