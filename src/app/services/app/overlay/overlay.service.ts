@@ -121,6 +121,10 @@ export class OverlayService {
     return this._cachedViewContainerRef;
   }
 
+  get hasOpenedOverlay(): boolean {
+    return this._openedOverlayRefs.length > 0;
+  }
+
   /**
    * Open a template as overlay.
    * @param templateRef - `TemplateRef` to open as an overlay.

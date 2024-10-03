@@ -173,6 +173,32 @@ export class AuthService {
       });
   }
 
+  startByKakao(code: string): void {
+    if (this.startLoading) {
+      return;
+    }
+
+    this.startLoading = true;
+
+    this._authApiService
+      .startByKakao(code)
+      .pipe(takeUntil(this._cancelStart))
+      .pipe(finalize(() => (this.startLoading = false)))
+      .subscribe({
+        next: (profile) => {
+          this.signedProfile = profile;
+          this.accessToken = profile.accessToken;
+          this.signChecked = true;
+          this.started.emit();
+        },
+        error: (err: HttpErrorResponse) => {
+          this.signedProfile = null;
+          this.accessToken = '';
+          this.startFailed.emit(err);
+        },
+      });
+  }
+
   /** Delete account */
   deleteAccount(): void {
     if (this.deleteAccountLoading) {

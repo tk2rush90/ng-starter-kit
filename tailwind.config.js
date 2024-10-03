@@ -27,6 +27,7 @@ module.exports = {
         warn: colors.amber,
         error: colors.red,
         success: colors.emerald,
+        kakao: '#FEE500',
       },
       outlineWidth: {
         3: '3px',

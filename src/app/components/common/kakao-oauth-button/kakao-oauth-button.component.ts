@@ -1,24 +1,24 @@
 import { Component, HostListener, Inject } from '@angular/core';
-import { IconGoogleLogoComponent } from '../../icons/icon-google-logo/icon-google-logo.component';
+import { IconKakaoComponent } from '../../icons/icon-kakao/icon-kakao.component';
+import { Location } from '@angular/common';
 import { OauthService } from '../../../services/app/oauth/oauth.service';
-import { environment } from '../../../../environments/environment';
 import { LocalStorageUtil } from '../../../utils/local-storage-util';
 import { OAUTH_PREVIOUS_URL_KEY, OAUTH_STATE_KEY } from '../../../constants/storage-keys';
-import { Location } from '@angular/common';
+import { environment } from '../../../../environments/environment';
 
 @Component({
-  selector: 'app-google-oauth-button',
+  selector: 'app-kakao-oauth-button',
   standalone: true,
-  imports: [IconGoogleLogoComponent],
-  templateUrl: './google-oauth-button.component.html',
-  styleUrl: './google-oauth-button.component.scss',
+  imports: [IconKakaoComponent],
+  templateUrl: './kakao-oauth-button.component.html',
+  styleUrl: './kakao-oauth-button.component.scss',
   host: {
-    class: 'stroke-button gap-2',
+    class: 'flat-button gap-2 kakao',
     type: 'button',
     role: 'button',
   },
 })
-export class GoogleOauthButtonComponent {
+export class KakaoOauthButtonComponent {
   constructor(
     @Inject(Location) private readonly _location: Location,
     private readonly _oauthService: OauthService,
@@ -31,9 +31,9 @@ export class GoogleOauthButtonComponent {
     LocalStorageUtil.set(OAUTH_STATE_KEY, state);
     LocalStorageUtil.set(OAUTH_PREVIOUS_URL_KEY, this._location.path(true));
 
-    this._oauthService.getGoogleAccessToken({
-      clientId: environment.google.clientId,
-      redirectUri: environment.google.redirectUri,
+    this._oauthService.getKakaoCode({
+      clientId: environment.kakao.clientId,
+      redirectUri: environment.kakao.redirectUri,
       state,
     });
   }

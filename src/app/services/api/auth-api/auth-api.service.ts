@@ -87,6 +87,12 @@ export class AuthApiService extends ApiService {
     });
   }
 
+  startByKakao(code: string): Observable<Profile> {
+    return this._http.post<Profile>(this.host + '/start/kakao', {
+      code,
+    });
+  }
+
   /** Delete account */
   deleteAccount(): Observable<DeletedAccount> {
     return this._http.post<DeletedAccount>(this.host + '/account/delete', {});

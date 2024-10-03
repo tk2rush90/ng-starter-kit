@@ -163,6 +163,13 @@
         active:outline-success-500/50
         focus:outline-success-500/50;
     }
+
+    &.kakao {
+      @apply bg-kakao
+      text-[#181600]
+      active:outline-kakao/50
+      focus:outline-kakao/50;
+    }
   }
 
   .stroke-button {
