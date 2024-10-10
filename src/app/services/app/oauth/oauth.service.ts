@@ -7,7 +7,15 @@ import { KakaoRedirectOptions } from '../../../data/kakao-redirect-options';
   providedIn: 'root',
 })
 export class OauthService {
-  getGoogleAccessToken({
+  getGoogleAccessToken(options: GoogleRedirectOptions): void {
+    location.href = this.getGoogleOAuthUrl(options);
+  }
+
+  getKakaoCode(options: KakaoRedirectOptions): void {
+    location.href = this.getKakaoOAuthUrl(options);
+  }
+
+  getGoogleOAuthUrl({
     clientId,
     redirectUri,
     scope = ['email', 'profile'],
@@ -16,7 +24,7 @@ export class OauthService {
     includeGrantedScopes,
     enableGranularConsent,
     loginHint,
-  }: GoogleRedirectOptions): void {
+  }: GoogleRedirectOptions): string {
     const url = new URL(environment.host.googleOauth2);
 
     url.searchParams.set('client_id', clientId);
@@ -44,10 +52,10 @@ export class OauthService {
       url.searchParams.set('state', state);
     }
 
-    location.href = url.toString();
+    return url.toString();
   }
 
-  getKakaoCode({
+  getKakaoOAuthUrl({
     clientId,
     redirectUri,
     scope = ['openid'],
@@ -56,7 +64,7 @@ export class OauthService {
     serviceTerms,
     state,
     nonce,
-  }: KakaoRedirectOptions): void {
+  }: KakaoRedirectOptions): string {
     const url = new URL(environment.host.kakaoOauth2);
 
     url.searchParams.set('client_id', clientId);
@@ -87,6 +95,6 @@ export class OauthService {
       url.searchParams.set('nonce', nonce);
     }
 
-    location.href = url.toString();
+    return url.toString();
   }
 }

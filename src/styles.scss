@@ -291,4 +291,10 @@
       }
     }
   }
+
+  .no-scrollbar {
+    &::-webkit-scrollbar {
+      @apply hidden;
+    }
+  }
 }
