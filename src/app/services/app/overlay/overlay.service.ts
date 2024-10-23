@@ -124,7 +124,7 @@ export class OverlayService {
       window.addEventListener(
         'click',
         (event) => {
-          if (event.target instanceof HTMLElement) {
+          if (event.target instanceof Element) {
             const target = event.target;
 
             this._openedOverlayRefs.forEach((_overlayRef) => {
