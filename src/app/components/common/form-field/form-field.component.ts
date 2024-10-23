@@ -1,11 +1,13 @@
 import {
   AfterContentInit,
+  booleanAttribute,
   Component,
   ContentChildren,
   ElementRef,
   HostBinding,
   HostListener,
   Inject,
+  Input,
   OnDestroy,
   QueryList,
   Renderer2,
@@ -16,12 +18,13 @@ import { DOCUMENT } from '@angular/common';
 import { IconChevronDownComponent } from '../../icons/icon-chevron-down/icon-chevron-down.component';
 import { Platform } from '../../../utils/platform';
 import { FormFieldAdditionalDirective } from './form-field-additional/form-field-additional.directive';
+import { IconAsteriskComponent } from '../../icons/icon-asterisk/icon-asterisk.component';
 
 /** A component to create form field */
 @Component({
   selector: 'app-form-field',
   standalone: true,
-  imports: [IconXMarkComponent, IconChevronDownComponent],
+  imports: [IconXMarkComponent, IconChevronDownComponent, IconAsteriskComponent],
   templateUrl: './form-field.component.html',
   styleUrl: './form-field.component.scss',
   host: {
@@ -29,6 +32,8 @@ import { FormFieldAdditionalDirective } from './form-field-additional/form-field
   },
 })
 export class FormFieldComponent implements AfterContentInit, OnDestroy {
+  @Input({ transform: booleanAttribute }) required = false;
+
   /** Focused status of control element */
   @HostBinding('class.focused') focused = false;
 
