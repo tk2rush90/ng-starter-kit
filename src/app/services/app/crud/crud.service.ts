@@ -4,32 +4,34 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable()
-export abstract class CrudService<Data> {
+export abstract class CrudService<Data, C = Data, R = Data, U = Data, D = Data> {
   createLoading$ = new BehaviorSubject(false);
 
-  created = new EventEmitter<Data>();
+  created = new EventEmitter<C>();
 
   createFailed = new EventEmitter<HttpErrorResponse>();
 
   fetchLoading$ = new BehaviorSubject(false);
 
-  fetched = new EventEmitter<Data>();
+  fetched = new EventEmitter<R>();
 
   fetchFailed = new EventEmitter<HttpErrorResponse>();
 
   updateLoading$ = new BehaviorSubject(false);
 
-  updated = new EventEmitter<Data>();
+  updated = new EventEmitter<U>();
 
   updateFailed = new EventEmitter<HttpErrorResponse>();
 
   deleteLoading$ = new BehaviorSubject(false);
 
-  deleted = new EventEmitter<Data>();
+  deleted = new EventEmitter<D>();
 
   deleteFailed = new EventEmitter<HttpErrorResponse>();
 
-  data$ = new BehaviorSubject<Data | null>(null);
+  data$ = new BehaviorSubject<R | null>(null);
+
+  onceFetched$ = new BehaviorSubject(false);
 
   private _cancelCreate = new EventEmitter<void>();
 
@@ -73,12 +75,20 @@ export abstract class CrudService<Data> {
     this.deleteLoading$.next(value);
   }
 
-  get data(): Data | null {
+  get data(): R | null {
     return this.data$.value;
   }
 
-  set data(value: Data | null) {
+  set data(value: R | null) {
     this.data$.next(value);
+  }
+
+  get onceFetched(): boolean {
+    return this.onceFetched$.value;
+  }
+
+  set onceFetched(value: boolean) {
+    this.onceFetched$.next(value);
   }
 
   create(...params: any[]): void {
@@ -97,7 +107,7 @@ export abstract class CrudService<Data> {
     throw new Error('Delete method is not implemented');
   }
 
-  protected _handleCreateObservable(observable: Observable<Data>): void {
+  protected _handleCreateObservable(observable: Observable<C>): void {
     if (this.createLoading) {
       return;
     }
@@ -114,7 +124,7 @@ export abstract class CrudService<Data> {
       });
   }
 
-  protected _handleFetchObservable(observable: Observable<Data>): void {
+  protected _handleFetchObservable(observable: Observable<R>): void {
     if (this.fetchLoading) {
       return;
     }
@@ -128,13 +138,14 @@ export abstract class CrudService<Data> {
       .subscribe({
         next: (data) => {
           this.data = data;
+          this.onceFetched = true;
           this.fetched.emit(data);
         },
         error: (err: HttpErrorResponse) => this.fetchFailed.emit(err),
       });
   }
 
-  protected _handleUpdateObservable(observable: Observable<Data>): void {
+  protected _handleUpdateObservable(observable: Observable<U>): void {
     if (this.updateLoading) {
       return;
     }
@@ -151,7 +162,7 @@ export abstract class CrudService<Data> {
       });
   }
 
-  protected _handleDeleteObservable(observable: Observable<Data>): void {
+  protected _handleDeleteObservable(observable: Observable<D>): void {
     if (this.deleteLoading) {
       return;
     }
