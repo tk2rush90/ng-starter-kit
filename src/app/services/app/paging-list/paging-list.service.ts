@@ -16,7 +16,7 @@ export abstract class PagingListService<Data> {
 
   nextCursor$ = new BehaviorSubject<string | undefined>(undefined);
 
-  fetchedOnce$ = new BehaviorSubject(false);
+  onceFetched$ = new BehaviorSubject(false);
 
   protected readonly _destroyRef = inject(DestroyRef);
 
@@ -46,12 +46,12 @@ export abstract class PagingListService<Data> {
     this.nextCursor$.next(value);
   }
 
-  get fetchedOnce(): boolean {
-    return this.fetchedOnce$.value;
+  get onceFetched(): boolean {
+    return this.onceFetched$.value;
   }
 
-  set fetchedOnce(value: boolean) {
-    this.fetchedOnce$.next(value);
+  set onceFetched(value: boolean) {
+    this.onceFetched$.next(value);
   }
 
   fetch(...params: any[]): void {
@@ -73,7 +73,7 @@ export abstract class PagingListService<Data> {
         next: (result) => {
           this.data = [...this.data, ...result.data];
           this.nextCursor = result.nextCursor;
-          this.fetchedOnce = true;
+          this.onceFetched = true;
           this.fetched.emit(result);
         },
         error: (err: HttpErrorResponse) => this.fetchFailed.emit(err),
