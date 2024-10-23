@@ -70,8 +70,56 @@ export class OverlayService {
    */
   private _cachedViewContainerRef?: ViewContainerRef;
 
+  private _closeableOverlayRefs: OverlayRef[] = [];
+
+  private _mouseUpTimeout: any;
+
   constructor(private readonly _applicationRef: ApplicationRef) {
     if (Platform.isBrowser) {
+      window.addEventListener(
+        'mousedown',
+        (event) => {
+          if (event.target instanceof Element) {
+            const target = event.target;
+
+            this._openedOverlayRefs.forEach((_overlayRef) => {
+              if (!_overlayRef.outsideClosingPrevented && _overlayRef.ready) {
+                const clickableRootNodes: HTMLElement[] =
+                  _overlayRef.embeddedViewRef?.rootNodes.filter(
+                    (_rootNode) =>
+                      _rootNode instanceof HTMLElement &&
+                      getComputedStyle(_rootNode).getPropertyValue('pointer-events') !== 'none',
+                  ) || [];
+
+                // 클릭 가능한 요소 그 어떤 것에도 mousedown 이 일어나지 않았을 경우만 close 가능한 OverlayRef 으로 지정
+                if (clickableRootNodes.every((_node) => !_node.contains(target))) {
+                  this._closeableOverlayRefs.push(_overlayRef);
+                }
+              }
+            });
+          }
+        },
+        {
+          capture: true,
+        },
+      );
+
+      window.addEventListener(
+        'mouseup',
+        () => {
+          clearTimeout(this._mouseUpTimeout);
+
+          // 마우스를 뗐을 경우 close 가능한 OverlayRef 클리어
+          // click 이벤트 감지 이후 실행하기 위해 setTimeout 사용
+          this._mouseUpTimeout = setTimeout(() => {
+            this._closeableOverlayRefs = [];
+          });
+        },
+        {
+          capture: true,
+        },
+      );
+
       // close on outside clicking
       window.addEventListener(
         'click',
@@ -90,7 +138,7 @@ export class OverlayService {
 
                 if (clickableRootNodes.some((_node) => _node.contains(target))) {
                   return;
-                } else {
+                } else if (this._closeableOverlayRefs.includes(_overlayRef)) {
                   _overlayRef.close();
                 }
               }
