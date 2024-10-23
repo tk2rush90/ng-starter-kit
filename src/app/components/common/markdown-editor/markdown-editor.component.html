@@ -173,7 +173,7 @@
   <input
     #imageUploader
     (uploaded)="onFileUploaded($event)"
-    (invalidFileType)="onInvalidFileType()"
+    (hasInvalidFiles)="onInvalidFileType()"
     hidden="hidden"
     type="file"
     accept="image/*"

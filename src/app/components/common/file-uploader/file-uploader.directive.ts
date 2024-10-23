@@ -1,10 +1,4 @@
-import {
-  Directive,
-  ElementRef,
-  EventEmitter,
-  HostListener,
-  Output,
-} from '@angular/core';
+import { Directive, ElementRef, EventEmitter, HostListener, Output } from '@angular/core';
 
 /**
  * A directive that handles file uploading for file input.
@@ -19,7 +13,7 @@ export class FileUploaderDirective {
   @Output() uploaded = new EventEmitter<File[]>();
 
   /** Emits when some uploaded files have invalid mimetype */
-  @Output() invalidFileType = new EventEmitter<void>();
+  @Output() hasInvalidFiles = new EventEmitter<number>();
 
   constructor(private readonly _elementRef: ElementRef<HTMLInputElement>) {}
 
@@ -33,8 +27,7 @@ export class FileUploaderDirective {
     const acceptedFiles: File[] = [];
 
     if (this._elementRef.nativeElement.files) {
-      // Status of having some error.
-      let hasError = false;
+      let numberOfInvalidFiles = 0;
 
       for (let i = 0; i < this._elementRef.nativeElement.files.length; i++) {
         // Get file.
@@ -57,18 +50,14 @@ export class FileUploaderDirective {
           // Add `_file` to `acceptedFiles`.
           acceptedFiles.push(_file);
         } else {
-          // When type not matched, emit error.
-          hasError = true;
-
-          this.invalidFileType.emit();
-
-          break;
+          numberOfInvalidFiles++;
         }
       }
 
-      // Emits files when not having any errors.
-      if (!hasError) {
-        this.uploaded.emit(acceptedFiles);
+      this.uploaded.emit(acceptedFiles);
+
+      if (numberOfInvalidFiles) {
+        this.hasInvalidFiles.emit(numberOfInvalidFiles);
       }
     }
 
