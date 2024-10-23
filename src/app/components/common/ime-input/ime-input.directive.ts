@@ -21,6 +21,7 @@ export class ImeInputDirective extends AppControlValueAccessor {
   /** This method does nothing */
   override writeValue(obj: any) {
     this._previousValue = obj;
+    this._elementRef.nativeElement.value = obj;
   }
 
   /** Update value immediately after keydown or keyup */
