@@ -1,10 +1,11 @@
 import UAParser, { IBrowser, IDevice, IOS } from 'ua-parser-js';
 import { isPlatformBrowser, isPlatformServer } from '@angular/common';
+import { environment } from '../../environments/environment';
 
 /** A class to detect about platform specification */
 export class Platform {
   /** User agent parser */
-  private static readonly _parser = new UAParser();
+  private static _parser = new UAParser();
 
   /** Platform id */
   private static _platformId: Object;
@@ -51,5 +52,13 @@ export class Platform {
   /** Get device information from UA */
   static get device(): IDevice {
     return this._parser.getDevice();
+  }
+
+  static get isApp(): boolean {
+    return navigator.userAgent.includes(environment.appName);
+  }
+
+  static reloadParser(): void {
+    this._parser = new UAParser();
   }
 }
