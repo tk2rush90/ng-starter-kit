@@ -5,6 +5,7 @@ import { environment } from '../../../../environments/environment';
 import { LocalStorageUtil } from '../../../utils/local-storage-util';
 import { OAUTH_PREVIOUS_URL_KEY, OAUTH_STATE_KEY } from '../../../constants/storage-keys';
 import { Location } from '@angular/common';
+import { Platform } from '../../../utils/platform';
 
 @Component({
   selector: 'app-google-oauth-button',
@@ -33,7 +34,7 @@ export class GoogleOauthButtonComponent {
 
     this._oauthService.getGoogleAccessToken({
       clientId: environment.google.clientId,
-      redirectUri: environment.google.redirectUri,
+      redirectUri: Platform.isApp ? environment.kakao.appRedirectUri : environment.kakao.redirectUri,
       state,
     });
   }

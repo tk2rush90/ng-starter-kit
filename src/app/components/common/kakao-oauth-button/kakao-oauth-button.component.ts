@@ -5,6 +5,7 @@ import { OauthService } from '../../../services/app/oauth/oauth.service';
 import { LocalStorageUtil } from '../../../utils/local-storage-util';
 import { OAUTH_PREVIOUS_URL_KEY, OAUTH_STATE_KEY } from '../../../constants/storage-keys';
 import { environment } from '../../../../environments/environment';
+import { Platform } from '../../../utils/platform';
 
 @Component({
   selector: 'app-kakao-oauth-button',
@@ -33,7 +34,7 @@ export class KakaoOauthButtonComponent {
 
     this._oauthService.getKakaoCode({
       clientId: environment.kakao.clientId,
-      redirectUri: environment.kakao.redirectUri,
+      redirectUri: Platform.isApp ? environment.kakao.appRedirectUri : environment.kakao.redirectUri,
       state,
     });
   }

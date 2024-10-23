@@ -6,6 +6,7 @@ import { BehaviorSubject, finalize, takeUntil } from 'rxjs';
 import { Profile } from '../../../data/profile';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DeletedAccount } from '../../../data/deleted-account';
+import { StartByKakao } from '../../../data/start-by-kakao';
 
 @Injectable({
   providedIn: 'root',
@@ -173,7 +174,7 @@ export class AuthService {
       });
   }
 
-  startByKakao(code: string): void {
+  startByKakao(body: StartByKakao): void {
     if (this.startLoading) {
       return;
     }
@@ -181,7 +182,7 @@ export class AuthService {
     this.startLoading = true;
 
     this._authApiService
-      .startByKakao(code)
+      .startByKakao(body)
       .pipe(takeUntil(this._cancelStart))
       .pipe(finalize(() => (this.startLoading = false)))
       .subscribe({

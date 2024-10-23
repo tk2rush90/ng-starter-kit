@@ -10,6 +10,7 @@ import { Email } from '../../../data/email';
 import { HttpParams } from '@angular/common/http';
 import { Nickname } from '../../../data/nickname';
 import { DeletedAccount } from '../../../data/deleted-account';
+import { StartByKakao } from '../../../data/start-by-kakao';
 
 @Injectable({
   providedIn: 'root',
@@ -87,10 +88,8 @@ export class AuthApiService extends ApiService {
     });
   }
 
-  startByKakao(code: string): Observable<Profile> {
-    return this._http.post<Profile>(this.host + '/start/kakao', {
-      code,
-    });
+  startByKakao(body: StartByKakao): Observable<Profile> {
+    return this._http.post<Profile>(this.host + '/start/kakao', body);
   }
 
   /** Delete account */

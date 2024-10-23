@@ -3,6 +3,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LocalStorageUtil } from '../../../utils/local-storage-util';
 import { OAUTH_STATE_KEY } from '../../../constants/storage-keys';
 import { BaseOauthHandlerDirective } from '../base-oauth-handler/base-oauth-handler.directive';
+import { Platform } from '../../../utils/platform';
+import { environment } from '../../../../environments/environment';
 
 @Directive({
   selector: '[appKakaoOauthHandler]',
@@ -33,7 +35,10 @@ export class KakaoOauthHandlerDirective extends BaseOauthHandlerDirective {
       const code = paramMap.get('code');
 
       if (code) {
-        this._authService.startByKakao(code);
+        this._authService.startByKakao({
+          code,
+          redirectUri: Platform.isApp ? environment.kakao.appRedirectUri : environment.kakao.redirectUri,
+        });
       }
     });
   }
