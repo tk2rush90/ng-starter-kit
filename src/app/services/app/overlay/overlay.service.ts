@@ -88,12 +88,9 @@ export class OverlayService {
                   _overlayRef.embeddedViewRef?.rootNodes.filter((_rootNode) => {
                     return (
                       _rootNode instanceof Element &&
-                      getComputedStyle(_rootNode).getPropertyValue(
-                        'pointer-events',
-                      ) !== 'none' &&
-                      getComputedStyle(_rootNode).getPropertyValue(
-                        'z-index',
-                      ) !== '-1'
+                      getComputedStyle(_rootNode).getPropertyValue('pointer-events') !== 'none' &&
+                      _rootNode instanceof HTMLElement &&
+                      !_rootNode.classList.contains('overlay-close-detector')
                     );
                   }) || [];
 
@@ -139,12 +136,9 @@ export class OverlayService {
                   _overlayRef.embeddedViewRef?.rootNodes.filter((_rootNode) => {
                     return (
                       _rootNode instanceof Element &&
-                      getComputedStyle(_rootNode).getPropertyValue(
-                        'pointer-events',
-                      ) !== 'none' &&
-                      getComputedStyle(_rootNode).getPropertyValue(
-                        'z-index',
-                      ) !== '-1'
+                      getComputedStyle(_rootNode).getPropertyValue('pointer-events') !== 'none' &&
+                      _rootNode instanceof HTMLElement &&
+                      !_rootNode.classList.contains('overlay-close-detector')
                     );
                   }) || [];
 
