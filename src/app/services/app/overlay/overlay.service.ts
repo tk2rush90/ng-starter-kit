@@ -85,11 +85,17 @@ export class OverlayService {
             this._openedOverlayRefs.forEach((_overlayRef) => {
               if (!_overlayRef.outsideClosingPrevented && _overlayRef.ready) {
                 const clickableRootNodes: HTMLElement[] =
-                  _overlayRef.embeddedViewRef?.rootNodes.filter(
-                    (_rootNode) =>
-                      _rootNode instanceof HTMLElement &&
-                      getComputedStyle(_rootNode).getPropertyValue('pointer-events') !== 'none',
-                  ) || [];
+                  _overlayRef.embeddedViewRef?.rootNodes.filter((_rootNode) => {
+                    return (
+                      _rootNode instanceof Element &&
+                      getComputedStyle(_rootNode).getPropertyValue(
+                        'pointer-events',
+                      ) !== 'none' &&
+                      getComputedStyle(_rootNode).getPropertyValue(
+                        'z-index',
+                      ) !== '-1'
+                    );
+                  }) || [];
 
                 // 클릭 가능한 요소 그 어떤 것에도 mousedown 이 일어나지 않았을 경우만 close 가능한 OverlayRef 으로 지정
                 if (clickableRootNodes.every((_node) => !_node.contains(target))) {
@@ -130,11 +136,17 @@ export class OverlayService {
             this._openedOverlayRefs.forEach((_overlayRef) => {
               if (!_overlayRef.outsideClosingPrevented && _overlayRef.ready) {
                 const clickableRootNodes: HTMLElement[] =
-                  _overlayRef.embeddedViewRef?.rootNodes.filter(
-                    (_rootNode) =>
-                      _rootNode instanceof HTMLElement &&
-                      getComputedStyle(_rootNode).getPropertyValue('pointer-events') !== 'none',
-                  ) || [];
+                  _overlayRef.embeddedViewRef?.rootNodes.filter((_rootNode) => {
+                    return (
+                      _rootNode instanceof Element &&
+                      getComputedStyle(_rootNode).getPropertyValue(
+                        'pointer-events',
+                      ) !== 'none' &&
+                      getComputedStyle(_rootNode).getPropertyValue(
+                        'z-index',
+                      ) !== '-1'
+                    );
+                  }) || [];
 
                 if (clickableRootNodes.some((_node) => _node.contains(target))) {
                   return;
