@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:pm2": "pm2 startOrRestart ecosystem.config.js --update-env",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",

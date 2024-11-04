@@ -29,4 +29,5 @@ serve:
   only:
     - master
   script:
+    - source ~/.gitlab-runner-zshrc && mkdir -p ~/Desktop/builds/ng-starter-kit && rm -rf ~/Desktop/builds/ng-starter-kit/ng-starter-kit && cp -r ./dist/ng-starter-kit ~/Desktop/builds/ng-starter-kit
     - source ~/.gitlab-runner-zshrc && npm run start:pm2
