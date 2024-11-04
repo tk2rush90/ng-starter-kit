@@ -1,9 +1,4 @@
-import {
-  ApplicationRef,
-  ComponentRef,
-  Injectable,
-  ViewContainerRef,
-} from '@angular/core';
+import { ApplicationRef, ComponentRef, Injectable, ViewContainerRef } from '@angular/core';
 import { ToastOutletComponent } from '../../../components/common/toast-outlet/toast-outlet.component';
 
 /** An interface of toast message */
@@ -32,12 +27,11 @@ export class ToastService {
   private _toastOutletRef?: ComponentRef<ToastOutletComponent>;
 
   constructor(private readonly _applicationRef: ApplicationRef) {
-    this._applicationRef.isStable.subscribe((stable) => {
-      if (stable && !this._toastOutletRef) {
-        const rootViewContainerRef =
-          this._applicationRef.components[0].injector.get(ViewContainerRef);
-        this._toastOutletRef =
-          rootViewContainerRef.createComponent(ToastOutletComponent);
+    // 앱 초기 렌더링 대기
+    setTimeout(() => {
+      if (!this._toastOutletRef) {
+        const rootViewContainerRef = this._applicationRef.components[0].injector.get(ViewContainerRef);
+        this._toastOutletRef = rootViewContainerRef.createComponent(ToastOutletComponent);
 
         this._toastOutletRef.changeDetectorRef.detectChanges();
       }
