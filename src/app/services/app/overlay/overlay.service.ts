@@ -20,7 +20,7 @@ export interface OverlayOptions {
    * `DestroyRef` to destroy overlay on destroying component.
    *  When it's not provided, overlay only can be destroyed manually.
    */
-  destroyRef?: DestroyRef;
+  destroyRef: DestroyRef | undefined;
 
   /** Callback to call when destroying EmbeddedViewRef. */
   onDestroy?: () => void;
