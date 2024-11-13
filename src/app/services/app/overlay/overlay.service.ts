@@ -185,7 +185,7 @@ export class OverlayService {
    * @param options - Options to open overlay.
    * @return `EmbeddedViewRef` of rendered `TemplateRef`.
    */
-  open<C = any>(templateRef: TemplateRef<C>, options?: OverlayOptions): OverlayRef<C> {
+  open<C = any>(templateRef: TemplateRef<C>, options: OverlayOptions): OverlayRef<C> {
     // When duplication not allowed, return existing `OverlayRef` if found.
     if (!options?.allowDuplicated) {
       const duplicatedOverlayRef = this._openedOverlayRefs.find(
