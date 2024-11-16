@@ -18,7 +18,7 @@ export class AuthService {
 
   logoutLoading$ = new BehaviorSubject(false);
 
-  deleteAccountLoading$ = new BehaviorSubject(false);
+  deleteLoading$ = new BehaviorSubject(false);
 
   started = new EventEmitter<Profile>();
 
@@ -34,7 +34,7 @@ export class AuthService {
 
   logoutFailed = new EventEmitter<HttpErrorResponse>();
 
-  deleteAccountFailed = new EventEmitter<HttpErrorResponse>();
+  deleteFailed = new EventEmitter<HttpErrorResponse>();
 
   signedProfile$ = new BehaviorSubject<Profile | null>(null);
 
@@ -54,40 +54,40 @@ export class AuthService {
     return LocalStorageUtil.get(ACCESS_TOKEN_KEY);
   }
 
-  set accessToken(accessToken: string) {
-    LocalStorageUtil.set(ACCESS_TOKEN_KEY, accessToken);
+  set accessToken(value: string) {
+    LocalStorageUtil.set(ACCESS_TOKEN_KEY, value);
   }
 
   get startLoading(): boolean {
     return this.startLoading$.value;
   }
 
-  set startLoading(startLoading: boolean) {
-    this.startLoading$.next(startLoading);
+  set startLoading(value: boolean) {
+    this.startLoading$.next(value);
   }
 
   get loginLoading(): boolean {
     return this.loginLoading$.value;
   }
 
-  set loginLoading(loginLoading: boolean) {
-    this.loginLoading$.next(loginLoading);
+  set loginLoading(value: boolean) {
+    this.loginLoading$.next(value);
   }
 
   get logoutLoading(): boolean {
     return this.logoutLoading$.value;
   }
 
-  set logoutLoading(logoutLoading: boolean) {
-    this.logoutLoading$.next(logoutLoading);
+  set logoutLoading(value: boolean) {
+    this.logoutLoading$.next(value);
   }
 
-  get deleteAccountLoading(): boolean {
-    return this.deleteAccountLoading$.value;
+  get deleteLoading(): boolean {
+    return this.deleteLoading$.value;
   }
 
-  set deleteAccountLoading(deleteAccountLoading: boolean) {
-    this.deleteAccountLoading$.next(deleteAccountLoading);
+  set deleteLoading(value: boolean) {
+    this.deleteLoading$.next(value);
   }
 
   get signedProfile(): Profile | null {
@@ -201,24 +201,24 @@ export class AuthService {
   }
 
   /** Delete account */
-  deleteAccount(): void {
-    if (this.deleteAccountLoading) {
+  delete(): void {
+    if (this.deleteLoading) {
       return;
     }
 
-    this.deleteAccountLoading = true;
+    this.deleteLoading = true;
 
     this._authApiService
       .deleteAccount()
       .pipe(takeUntil(this._cancelDeleteAccount))
-      .pipe(finalize(() => (this.deleteAccountLoading = false)))
+      .pipe(finalize(() => (this.deleteLoading = false)))
       .subscribe({
         next: (deletedAccount) => {
           this.signedProfile = null;
           this.accessToken = '';
           this.accountDeleted.emit(deletedAccount);
         },
-        error: (err: HttpErrorResponse) => this.deleteAccountFailed.emit(err),
+        error: (err: HttpErrorResponse) => this.deleteFailed.emit(err),
       });
   }
 
@@ -232,6 +232,7 @@ export class AuthService {
   private _onLoginFailed(err: HttpErrorResponse): void {
     this.signedProfile = null;
     this.accessToken = '';
+    this.signChecked = true;
     this.loginFailed.emit(err);
   }
 
