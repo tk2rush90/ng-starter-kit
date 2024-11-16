@@ -33,6 +33,8 @@ export interface OverlayOptions {
 
   /** Set to prevent closing overlay by Escape key */
   preventKeyboardClosing?: boolean;
+
+  parentOverlayRef?: OverlayRef;
 }
 
 /** Reference of opened overlay */
@@ -48,6 +50,12 @@ export interface OverlayRef<C = any> {
 
   /** Outside closing prevented status */
   outsideClosingPrevented: boolean;
+
+  /** `keyboardClosingPrevented`의 원래 값을 기록해두기 위함 */
+  initialKeyboardClosingPrevented: boolean;
+
+  /** `outsideClosingPrevented`의 원래 값을 기록해두기 위함 */
+  initialOutsideClosingPrevented: boolean;
 
   /** Overlay ready status. Outside closing works after ready*/
   ready: boolean;
@@ -197,14 +205,28 @@ export class OverlayService {
       }
     }
 
+    // `parentOverlayRef`이 제공될 경우 닫기 방지
+    if (options.parentOverlayRef) {
+      options.parentOverlayRef.outsideClosingPrevented = true;
+      options.parentOverlayRef.keyboardClosingPrevented = true;
+    }
+
     // Create `OverlayRef`.
     const overlayRef: OverlayRef = {
       templateRef,
       keyboardClosingPrevented: !!options?.preventKeyboardClosing,
       outsideClosingPrevented: !!options?.preventOutsideClosing,
+      initialKeyboardClosingPrevented: !!options?.preventKeyboardClosing,
+      initialOutsideClosingPrevented: !!options?.preventOutsideClosing,
       ready: false,
       close: () => {
         this.close(overlayRef);
+
+        // `parentOverlayRef`이 제공될 경우 원래 상태로 복원
+        if (options.parentOverlayRef) {
+          options.parentOverlayRef.outsideClosingPrevented = options.parentOverlayRef.initialOutsideClosingPrevented;
+          options.parentOverlayRef.keyboardClosingPrevented = options.parentOverlayRef.initialKeyboardClosingPrevented;
+        }
       },
     };
 
