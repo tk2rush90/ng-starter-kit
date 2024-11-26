@@ -1,0 +1,6 @@
+<button
+  (click)="$event.preventDefault(); $event.stopPropagation(); clickButton.emit()"
+  type="button"
+  class="flex-center size-7 bg-gray-700 hover:brightness-110 active:brightness-125 transition-all rounded x-non-extendable">
+  <ng-content></ng-content>
+</button>

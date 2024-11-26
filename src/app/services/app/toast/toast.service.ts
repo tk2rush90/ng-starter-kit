@@ -1,4 +1,4 @@
-import { ApplicationRef, ComponentRef, Injectable, ViewContainerRef } from '@angular/core';
+import { ApplicationRef, ComponentRef, Injectable, OnDestroy, ViewContainerRef } from '@angular/core';
 import { ToastOutletComponent } from '../../../components/common/toast-outlet/toast-outlet.component';
 
 /** An interface of toast message */
@@ -19,16 +19,18 @@ export interface ToastMessage {
 @Injectable({
   providedIn: 'root',
 })
-export class ToastService {
+export class ToastService implements OnDestroy {
   /** Opened toasts */
   toasts: ToastMessage[] = [];
 
   /** Rendered ToastOutletComponent */
   private _toastOutletRef?: ComponentRef<ToastOutletComponent>;
 
+  private readonly _renderTimeout: any;
+
   constructor(private readonly _applicationRef: ApplicationRef) {
     // 앱 초기 렌더링 대기
-    setTimeout(() => {
+    this._renderTimeout = setTimeout(() => {
       if (!this._toastOutletRef) {
         const rootViewContainerRef = this._applicationRef.components[0].injector.get(ViewContainerRef);
         this._toastOutletRef = rootViewContainerRef.createComponent(ToastOutletComponent);
@@ -36,6 +38,10 @@ export class ToastService {
         this._toastOutletRef.changeDetectorRef.detectChanges();
       }
     });
+  }
+
+  ngOnDestroy() {
+    clearTimeout(this._renderTimeout);
   }
 
   /**
