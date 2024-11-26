@@ -4,6 +4,7 @@ import {
   EmbeddedViewRef,
   Injectable,
   Injector,
+  OnDestroy,
   TemplateRef,
   ViewContainerRef,
 } from '@angular/core';
@@ -68,7 +69,7 @@ export interface OverlayRef<C = any> {
 @Injectable({
   providedIn: 'root',
 })
-export class OverlayService {
+export class OverlayService implements OnDestroy {
   /** Opened overlays */
   private _openedOverlayRefs: OverlayRef[] = [];
 
@@ -82,88 +83,92 @@ export class OverlayService {
 
   private _mouseUpTimeout: any;
 
+  private readonly _eventTimeout: any;
+
   constructor(private readonly _applicationRef: ApplicationRef) {
-    if (Platform.isBrowser) {
-      window.addEventListener(
-        'mousedown',
-        (event) => {
-          if (event.target instanceof Element) {
-            const target = event.target;
+    this._eventTimeout = setTimeout(() => {
+      if (Platform.isBrowser) {
+        window.addEventListener(
+          'mousedown',
+          (event) => {
+            if (event.target instanceof Element) {
+              const target = event.target;
 
-            this._openedOverlayRefs.forEach((_overlayRef) => {
-              if (!_overlayRef.outsideClosingPrevented && _overlayRef.ready) {
-                const clickableRootNodes: HTMLElement[] =
-                  _overlayRef.embeddedViewRef?.rootNodes.filter((_rootNode) => {
-                    return (
-                      _rootNode instanceof Element &&
-                      getComputedStyle(_rootNode).getPropertyValue('pointer-events') !== 'none' &&
-                      _rootNode instanceof HTMLElement &&
-                      !_rootNode.classList.contains('overlay-close-detector')
-                    );
-                  }) || [];
+              this._openedOverlayRefs.forEach((_overlayRef) => {
+                if (!_overlayRef.outsideClosingPrevented && _overlayRef.ready) {
+                  const clickableRootNodes: HTMLElement[] =
+                    _overlayRef.embeddedViewRef?.rootNodes.filter((_rootNode) => {
+                      return (
+                        _rootNode instanceof Element &&
+                        getComputedStyle(_rootNode).getPropertyValue('pointer-events') !== 'none' &&
+                        _rootNode instanceof HTMLElement &&
+                        !_rootNode.classList.contains('overlay-close-detector')
+                      );
+                    }) || [];
 
-                // 클릭 가능한 요소 그 어떤 것에도 mousedown 이 일어나지 않았을 경우만 close 가능한 OverlayRef 으로 지정
-                if (clickableRootNodes.every((_node) => !_node.contains(target))) {
-                  this._closeableOverlayRefs.push(_overlayRef);
+                  // 클릭 가능한 요소 그 어떤 것에도 mousedown 이 일어나지 않았을 경우만 close 가능한 OverlayRef 으로 지정
+                  if (clickableRootNodes.every((_node) => !_node.contains(target))) {
+                    this._closeableOverlayRefs.push(_overlayRef);
+                  }
                 }
-              }
+              });
+            }
+          },
+          {
+            capture: true,
+          },
+        );
+
+        window.addEventListener(
+          'mouseup',
+          () => {
+            clearTimeout(this._mouseUpTimeout);
+
+            // 마우스를 뗐을 경우 close 가능한 OverlayRef 클리어
+            // click 이벤트 감지 이후 실행하기 위해 setTimeout 사용
+            this._mouseUpTimeout = setTimeout(() => {
+              this._closeableOverlayRefs = [];
             });
-          }
-        },
-        {
-          capture: true,
-        },
-      );
+          },
+          {
+            capture: true,
+          },
+        );
 
-      window.addEventListener(
-        'mouseup',
-        () => {
-          clearTimeout(this._mouseUpTimeout);
+        // close on outside clicking
+        window.addEventListener(
+          'click',
+          (event) => {
+            if (event.target instanceof Element) {
+              const target = event.target;
 
-          // 마우스를 뗐을 경우 close 가능한 OverlayRef 클리어
-          // click 이벤트 감지 이후 실행하기 위해 setTimeout 사용
-          this._mouseUpTimeout = setTimeout(() => {
-            this._closeableOverlayRefs = [];
-          });
-        },
-        {
-          capture: true,
-        },
-      );
+              this._openedOverlayRefs.forEach((_overlayRef) => {
+                if (!_overlayRef.outsideClosingPrevented && _overlayRef.ready) {
+                  const clickableRootNodes: HTMLElement[] =
+                    _overlayRef.embeddedViewRef?.rootNodes.filter((_rootNode) => {
+                      return (
+                        _rootNode instanceof Element &&
+                        getComputedStyle(_rootNode).getPropertyValue('pointer-events') !== 'none' &&
+                        _rootNode instanceof HTMLElement &&
+                        !_rootNode.classList.contains('overlay-close-detector')
+                      );
+                    }) || [];
 
-      // close on outside clicking
-      window.addEventListener(
-        'click',
-        (event) => {
-          if (event.target instanceof Element) {
-            const target = event.target;
-
-            this._openedOverlayRefs.forEach((_overlayRef) => {
-              if (!_overlayRef.outsideClosingPrevented && _overlayRef.ready) {
-                const clickableRootNodes: HTMLElement[] =
-                  _overlayRef.embeddedViewRef?.rootNodes.filter((_rootNode) => {
-                    return (
-                      _rootNode instanceof Element &&
-                      getComputedStyle(_rootNode).getPropertyValue('pointer-events') !== 'none' &&
-                      _rootNode instanceof HTMLElement &&
-                      !_rootNode.classList.contains('overlay-close-detector')
-                    );
-                  }) || [];
-
-                if (clickableRootNodes.some((_node) => _node.contains(target))) {
-                  return;
-                } else if (this._closeableOverlayRefs.includes(_overlayRef)) {
-                  _overlayRef.close();
+                  if (clickableRootNodes.some((_node) => _node.contains(target))) {
+                    return;
+                  } else if (this._closeableOverlayRefs.includes(_overlayRef)) {
+                    _overlayRef.close();
+                  }
                 }
-              }
-            });
-          }
-        },
-        {
-          capture: true,
-        },
-      );
-    }
+              });
+            }
+          },
+          {
+            capture: true,
+          },
+        );
+      }
+    });
   }
 
   /**
@@ -185,6 +190,11 @@ export class OverlayService {
 
   get hasOpenedOverlay(): boolean {
     return this._openedOverlayRefs.length > 0;
+  }
+
+  ngOnDestroy() {
+    clearTimeout(this._eventTimeout);
+    clearTimeout(this._mouseUpTimeout);
   }
 
   /**
