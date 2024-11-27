@@ -298,3 +298,27 @@
     }
   }
 }
+
+.prosemirror-dropcursor-animation {
+  @apply rounded-full;
+  animation: fadeIn .5s forwards;
+}
+
+.prosemirror-placeholder::before {
+  @apply text-gray-400 dark:text-gray-600 pointer-events-none absolute transition-all opacity-0 hover:opacity-100;
+  content: attr(data-placeholder);
+
+  &.prosemirror-no-placeholder {
+    @apply hidden;
+  }
+}
+
+.prose {
+  img {
+    @apply w-full h-auto;
+  }
+
+  iframe {
+    @apply w-full aspect-video;
+  }
+}
