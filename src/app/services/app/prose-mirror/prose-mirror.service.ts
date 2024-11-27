@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { EditorState, NodeSelection, TextSelection, Transaction } from 'prosemirror-state';
 import { schema } from 'prosemirror-schema-basic';
-import { Decoration, DecorationSet, EditorView, NodeView } from 'prosemirror-view';
+import { Decoration, DecorationSet, EditorView, NodeView, ViewMutationRecord } from 'prosemirror-view';
 import { history, redo, undo } from 'prosemirror-history';
 import { keymap } from 'prosemirror-keymap';
 import { baseKeymap, setBlockType, toggleMark, wrapIn } from 'prosemirror-commands';
@@ -147,7 +147,7 @@ export abstract class NoContentNodeView implements NodeView {
     dispatch(transaction);
   }
 
-  ignoreMutation(mutation: MutationRecord): boolean {
+  ignoreMutation(mutation: ViewMutationRecord): boolean {
     return this.actions === mutation.target;
   }
 
