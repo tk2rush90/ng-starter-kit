@@ -34,7 +34,7 @@ export class GoogleOauthButtonComponent {
 
     this._oauthService.getGoogleAccessToken({
       clientId: environment.google.clientId,
-      redirectUri: Platform.isApp ? environment.kakao.appRedirectUri : environment.kakao.redirectUri,
+      redirectUri: Platform.isApp ? environment.google.appRedirectUri : environment.google.redirectUri,
       state,
     });
   }
