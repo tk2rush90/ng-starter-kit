@@ -1,218 +1,34 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { EventEmitter, Inject, Injectable, OnDestroy } from '@angular/core';
 import { EditorState, NodeSelection, TextSelection, Transaction } from 'prosemirror-state';
 import { schema } from 'prosemirror-schema-basic';
-import { Decoration, DecorationSet, EditorView, NodeView, ViewMutationRecord } from 'prosemirror-view';
+import { Decoration, DecorationSet, EditorView } from 'prosemirror-view';
 import { history, redo, undo } from 'prosemirror-history';
 import { keymap } from 'prosemirror-keymap';
 import { baseKeymap, setBlockType, toggleMark, wrapIn } from 'prosemirror-commands';
-import { Node as ProseMirrorNode, Schema } from 'prosemirror-model';
+import { DOMParser, Node as ProseMirrorNode, Schema } from 'prosemirror-model';
 import { addListNodes, liftListItem, sinkListItem, splitListItem } from 'prosemirror-schema-list';
 import { dropCursor } from 'prosemirror-dropcursor';
 import colors from 'tailwindcss/colors';
 import { inputRules, textblockTypeInputRule, wrappingInputRule } from 'prosemirror-inputrules';
 import { ToastService } from '../toast/toast.service';
-
-export abstract class NoContentNodeView implements NodeView {
-  node: ProseMirrorNode;
-
-  view: EditorView;
-
-  getPos: () => number | undefined;
-
-  dom: HTMLElement;
-
-  actions: HTMLElement;
-
-  document: Document;
-
-  mutationObserver: MutationObserver;
-
-  protected constructor(node: ProseMirrorNode, view: EditorView, getPos: () => number | undefined) {
-    this.node = node;
-    this.view = view;
-    this.getPos = getPos;
-
-    this.document = this.view.root as Document;
-
-    this.dom = this.document.createElement('div');
-    this.dom.classList.add(
-      'relative',
-      'prosemirror-no-placeholder', // 이미지 노드에서 placeholder 표시하지 않기 위해 추가
-    );
-    this.dom.contentEditable = 'true';
-
-    this.actions = this.document.createElement('div');
-    this.actions.classList.add(
-      'flex-center-start',
-      'rounded',
-      'p-1',
-      'bg-gray-700',
-      'gap-0.5',
-      'absolute',
-      'top-full',
-      'right-0',
-      'translate-y-2',
-      'opacity-0',
-      'pointer-events-none',
-      'transition-all',
-      'z-50',
-    );
-
-    const addButton = this.document.createElement('button');
-
-    addButton.type = 'button';
-    addButton.classList.add(
-      'flex-center',
-      'size-7',
-      'bg-gray-700',
-      'hover:brightness-110',
-      'active:brightness-125',
-      'transition-all',
-      'rounded',
-    );
-    addButton.innerHTML =
-      '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>';
-
-    const removeButton = this.document.createElement('button');
-
-    removeButton.type = 'button';
-    removeButton.classList.add(
-      'flex-center',
-      'size-7',
-      'bg-gray-700',
-      'hover:brightness-110',
-      'active:brightness-125',
-      'transition-all',
-      'rounded',
-    );
-    removeButton.innerHTML =
-      '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
-
-    addButton.addEventListener('click', (event) => {
-      event.preventDefault();
-
-      this.addParagraph();
-    });
-
-    removeButton.addEventListener('click', (event) => {
-      event.preventDefault();
-
-      this.destroy();
-    });
-
-    this.actions.append(addButton, removeButton);
-
-    this.dom.append(this.actions);
-
-    this.mutationObserver = new MutationObserver((records) => {
-      records.forEach((_record) => {
-        if (_record.attributeName === 'class') {
-          const target = _record.target as HTMLElement;
-
-          if (target.classList.contains('ProseMirror-selectednode')) {
-            this.showActions();
-          } else {
-            this.hideActions();
-          }
-        }
-      });
-    });
-
-    this.mutationObserver.observe(this.dom, {
-      attributes: true,
-    });
-  }
-
-  showActions(): void {
-    this.actions.classList.add('opacity-100');
-    this.actions.classList.remove('opacity-0', 'pointer-events-none');
-  }
-
-  hideActions(): void {
-    this.actions.classList.add('opacity-0', 'pointer-events-none');
-    this.actions.classList.remove('opacity-100');
-  }
-
-  addParagraph(): void {
-    const { state, dispatch } = this.view;
-    const { tr, schema, selection } = state;
-    const { $from } = selection;
-
-    const rootBlockPos = $from.start(1);
-
-    let transaction = tr.insert(rootBlockPos, schema.nodes['paragraph'].create());
-
-    transaction = transaction.setSelection(TextSelection.create(transaction.doc, rootBlockPos + 1));
-
-    dispatch(transaction);
-  }
-
-  ignoreMutation(mutation: ViewMutationRecord): boolean {
-    return this.actions === mutation.target;
-  }
-
-  destroy() {
-    this.dom.remove();
-  }
-}
-
-export class ImageNodeView extends NoContentNodeView {
-  image: HTMLImageElement;
-
-  constructor(node: ProseMirrorNode, view: EditorView, getPos: () => number | undefined) {
-    super(node, view, getPos);
-
-    this.image = this.document.createElement('img');
-
-    this.image.src = this.node.attrs['src'];
-    this.image.alt = this.node.attrs['alt'] || '';
-    this.image.title = this.node.attrs['title'] || '';
-
-    this.dom.append(this.image);
-  }
-
-  update(node: ProseMirrorNode) {
-    if (node.type === this.node.type) {
-      this.node = node;
-      this.image.src = this.node.attrs['src'];
-
-      return true;
-    } else {
-      return false;
-    }
-  }
-}
-
-export class YoutubeEmbedNodeView extends NoContentNodeView {
-  iframe: HTMLIFrameElement;
-
-  constructor(node: ProseMirrorNode, view: EditorView, getPos: () => number | undefined) {
-    super(node, view, getPos);
-
-    this.iframe = this.document.createElement('iframe');
-
-    this.iframe.src = `https://www.youtube.com/embed/${this.node.attrs['videoId']}`;
-    this.iframe.style.border = 'none';
-    this.iframe.allowFullscreen = true;
-
-    this.dom.append(this.iframe);
-  }
-
-  update(node: ProseMirrorNode) {
-    if (node.type === this.node.type) {
-      this.node = node;
-      this.iframe.src = `https://www.youtube.com/embed/${this.node.attrs['videoId']}`;
-
-      return true;
-    } else {
-      return false;
-    }
-  }
-}
+import { isMark } from './utils/is-mark';
+import { getMark } from './utils/get-mark';
+import { YoutubeEmbedNodeView } from './node-view/youtube-embed-node-view';
+import { ProseMirrorFile } from '../../../data/prose-mirror-file';
+import { ImageNodeView } from './node-view/image-node-view';
+import { ProseMirrorNodeJson } from '../../../data/prose-mirror-node-json';
+import { DOCUMENT } from '@angular/common';
+import { MarkdownService } from '../markdown/markdown.service';
+import { getNode } from './utils/get-node';
+import { fileToBase64 } from '../../../utils/file';
 
 @Injectable()
 export class ProseMirrorService implements OnDestroy {
-  files: File[] = [];
+  files: ProseMirrorFile[] = [];
+
+  onReady = new EventEmitter<void>();
+
+  draggingFileUrls: string[] = [];
 
   /** 커스텀 스키마 */
   private readonly _schema = new Schema({
@@ -231,7 +47,7 @@ export class ProseMirrorService implements OnDestroy {
         parseDOM: [
           {
             tag: 'iframe[src]',
-            getAttrs(dom) {
+            getAttrs: (dom) => {
               const src = dom.getAttribute('src');
 
               if (src) {
@@ -244,7 +60,7 @@ export class ProseMirrorService implements OnDestroy {
             },
           },
         ],
-        toDOM(node) {
+        toDOM: (node) => {
           const { videoId } = node.attrs;
 
           return [
@@ -258,6 +74,30 @@ export class ProseMirrorService implements OnDestroy {
         },
       }),
     marks: schema.spec.marks
+      .update('link', {
+        ...schema.spec.marks.get('link'),
+        attrs: {
+          href: {},
+          title: { default: null },
+        },
+        inclusive: false,
+        parseDOM: [
+          {
+            tag: 'a[href]',
+            getAttrs: (dom) => {
+              return {
+                href: dom.getAttribute('href'),
+                title: dom.getAttribute('title'),
+              };
+            },
+          },
+        ],
+        toDOM: (node) => {
+          console.log(node);
+
+          return ['a', { ...node.attrs, target: '_blank', rel: 'noopener noreferrer' }, 0];
+        },
+      })
       .addToEnd('underline', {
         parseDOM: [{ tag: 'u' }, { style: 'text-decoration=underline' }],
         toDOM: () => {
@@ -272,21 +112,28 @@ export class ProseMirrorService implements OnDestroy {
       })
       .addToEnd('code', {
         parseDOM: [{ tag: 'code' }],
-        toDOM() {
+        toDOM: () => {
           return ['code', 0];
         },
       }),
   });
 
+  private _resetDraggingTimeout: any;
+
   private readonly _state: EditorState;
 
-  constructor(private readonly _toastService: ToastService) {
+  constructor(
+    @Inject(DOCUMENT) private readonly _document: Document,
+    private readonly _toastService: ToastService,
+    private readonly _markdownService: MarkdownService,
+  ) {
     // 내부에서 사용되는 this의 바인딩을 위해
     this.undo = this.undo.bind(this);
     this.redo = this.redo.bind(this);
     this.toggleBold = this.toggleBold.bind(this);
     this.toggleUnderline = this.toggleUnderline.bind(this);
     this.toggleItalic = this.toggleItalic.bind(this);
+    this.toggleCode = this.toggleCode.bind(this);
     this.increaseIndent = this.increaseIndent.bind(this);
     this.decreaseIndent = this.decreaseIndent.bind(this);
 
@@ -325,6 +172,7 @@ export class ProseMirrorService implements OnDestroy {
           'Enter': splitListItem(this._schema.nodes['list_item']),
           'Tab': this.increaseIndent,
           'S-Tab': this.decreaseIndent,
+          'Mod-e': this.toggleCode,
         }),
         keymap(baseKeymap),
       ],
@@ -335,10 +183,16 @@ export class ProseMirrorService implements OnDestroy {
     return this._view;
   }
 
+  get schema(): Schema {
+    return this._schema;
+  }
+
   private _view?: EditorView;
 
   ngOnDestroy() {
     this._view?.destroy();
+
+    clearTimeout(this._resetDraggingTimeout);
   }
 
   createView(parentElement: HTMLElement): void {
@@ -346,10 +200,10 @@ export class ProseMirrorService implements OnDestroy {
       state: this._state,
       attributes: { spellcheck: 'false' },
       nodeViews: {
-        image: (node, view, getPos, decorations, innerDecorations) => {
-          return new ImageNodeView(node, view, getPos);
+        image: (node, view, getPos) => {
+          return new ImageNodeView(node, view, getPos, this);
         },
-        youtube_embed: (node, view, getPos, decorations, innerDecorations) => {
+        youtube_embed: (node, view, getPos) => {
           return new YoutubeEmbedNodeView(node, view, getPos);
         },
       },
@@ -360,28 +214,10 @@ export class ProseMirrorService implements OnDestroy {
         // 문서의 각 노드를 검사하여 빈 블록에 데코레이션 추가
         doc.descendants((node, pos) => {
           if (node.isBlock && node.childCount === 0) {
-            let placeholder: string;
-
-            switch (node.type.name) {
-              case 'paragraph': {
-                placeholder = '본문';
-                break;
-              }
-
-              case 'heading': {
-                placeholder = '제목';
-                break;
-              }
-
-              default: {
-                placeholder = '내용';
-              }
-            }
-
             decorations.push(
               Decoration.node(pos, pos + node.nodeSize, {
                 'class': 'prosemirror-placeholder',
-                'data-placeholder': placeholder,
+                'data-placeholder': '내용을 입력하세요',
               }),
             );
           }
@@ -389,14 +225,26 @@ export class ProseMirrorService implements OnDestroy {
 
         return DecorationSet.create(doc, decorations);
       },
+      dispatchTransaction: (transaction) => {
+        const view = this.view;
+
+        if (view) {
+          view.updateState(view.state.apply(transaction));
+
+          this.scrollToCenter();
+        }
+      },
       handleKeyDown: (view, event) => {
         const { state, dispatch } = view;
         const { selection, doc } = state;
         const { $from, $to } = selection;
 
-        // start + 1, end - 1을 해줘야 내부 텍스트만 선택됨
-        // 그냥 start, end 를 사용하면 요소 바깥으로 선택되기 때문에 의도치 않은 오류 발생
         if (event.ctrlKey && event.key === 'a') {
+          // Ctrl+A 시 현재 블럭 노드가 선택되어 있지 않으면 현재 블럭 노드 선택
+          // 이후 한 번 더 Ctrl+A를 하면 에디터 전체 컨텐츠 선택
+          // 현재 블럭 노드가 비어 잇어도 전체 컨텐츠 선택
+          // start + 1, end - 1을 해줘야 내부 텍스트만 선택됨
+          // 그냥 start, end 를 사용하면 요소 바깥으로 선택되기 때문에 의도치 않은 오류 발생
           // 현재 블록 요소 범위 가져오기
           const blockRange = $from.blockRange($to);
 
@@ -421,6 +269,10 @@ export class ProseMirrorService implements OnDestroy {
           dispatch(state.tr.setSelection(newSelection));
 
           return true;
+        } else if (event.key === ' ' && isMark(view, 'link')) {
+          this._removeMarkBySpace(view, 'link', event);
+        } else if (event.key === ' ' && isMark(view, 'code')) {
+          this._removeMarkBySpace(view, 'code', event);
         }
 
         return false;
@@ -429,6 +281,8 @@ export class ProseMirrorService implements OnDestroy {
       // 붙여넣기 된 이미지는 files 배열에 추가
       handlePaste: (view, event) => {
         const items = event.clipboardData?.items;
+
+        console.log('paste');
 
         if (items) {
           for (let i = 0; i < items.length; i++) {
@@ -458,18 +312,30 @@ export class ProseMirrorService implements OnDestroy {
         if (dataTransfer?.files?.length) {
           const file = dataTransfer.files[0];
 
-          if (file.type.startsWith('image/')) {
-            this.insertImageFile(view, file);
+          fileToBase64(file).then((base64) => {
+            const dragging = this.draggingFileUrls.includes(base64);
 
-            event.preventDefault();
-
-            return true;
-          }
+            // 드래그 중인 파일이 아닐 경우 files에 추가
+            if (!dragging && file.type.startsWith('image/')) {
+              this.files.push({
+                originalFile: file,
+                objectUrl: base64,
+              });
+            }
+          });
         }
+
+        clearTimeout(this._resetDraggingTimeout);
+
+        this._resetDraggingTimeout = setTimeout(() => {
+          this.draggingFileUrls = [];
+        });
 
         return false;
       },
     });
+
+    this.onReady.emit();
   }
 
   undo(state: EditorState, dispatch?: (tr: Transaction) => void, view?: EditorView): boolean {
@@ -494,6 +360,23 @@ export class ProseMirrorService implements OnDestroy {
 
   toggleLineThrough(state: EditorState, dispatch?: (tr: Transaction) => void, view?: EditorView): boolean {
     return toggleMark(this._schema.marks['strike'])(state, dispatch, view);
+  }
+
+  insertParagraph(view: EditorView): void {
+    const { state, dispatch } = view;
+
+    // 새 paragraph 노드를 생성
+    const paragraphNode = state.schema.nodes['paragraph'].create();
+
+    const position = state.selection.$from.pos + 1;
+
+    // 트랜잭션을 통해 새 paragraph 삽입
+    let transaction = state.tr.insert(position, paragraphNode);
+
+    // 추가한 지점에서 한 번 더 +1을 해줘야 올바른 컨텐츠 수정 가능
+    transaction = transaction.setSelection(TextSelection.create(transaction.doc, position + 1));
+
+    dispatch(transaction);
   }
 
   insertBlockQuote(state: EditorState, dispatch?: (tr: Transaction) => void, view?: EditorView): boolean {
@@ -536,6 +419,101 @@ export class ProseMirrorService implements OnDestroy {
     return toggleMark(this._schema.marks['code'])(state, dispatch, view);
   }
 
+  setLink(href: string): boolean {
+    const view = this.view;
+
+    if (view) {
+      const { state, dispatch } = view;
+
+      let { from, to } = state.selection;
+
+      dispatch(state.tr.addMark(from, to, this._schema.marks['link'].create({ href })));
+
+      return true;
+    }
+
+    return false;
+  }
+
+  selectMark(name: string): void {
+    const view = this.view;
+
+    if (view) {
+      const { state, dispatch } = view;
+      const { $from } = state.selection;
+
+      // 현재 커서 위치에서 적용된 마크 확인
+      const mark = $from.marks().find((_mark) => _mark.type.name === name);
+
+      // 적용된 마크 없음
+      if (!mark) {
+        return;
+      }
+
+      let start = $from.pos;
+      let end = $from.pos;
+
+      state.doc.nodesBetween($from.before(), $from.after(), (node, pos) => {
+        if (node.isText) {
+          const marks = node.marks.filter((_mark) => _mark.type.name === name);
+
+          if (marks.length > 0) {
+            start = Math.min(start, pos);
+            end = Math.max(end, pos + node.nodeSize);
+          }
+        }
+      });
+
+      // 새로운 텍스트 선택 영역 설정
+      const transaction = state.tr.setSelection(TextSelection.create(state.doc, start, end));
+
+      dispatch(transaction);
+    }
+  }
+
+  removeMark(name: string): void {
+    const view = this.view;
+
+    if (view) {
+      const { state, dispatch } = view;
+      const { from, to } = state.selection;
+
+      const transaction = state.tr.removeMark(from, to, this._schema.marks[name]);
+
+      dispatch(transaction);
+    }
+  }
+
+  setCaption(caption: string): void {
+    if (caption && this.view) {
+      const imageNode = getNode(this.view, 'image');
+
+      if (imageNode) {
+        this.view.dispatch(
+          this.view.state.tr.setNodeMarkup(this.view.state.selection.from, null, {
+            ...imageNode.attrs,
+            alt: caption,
+          }),
+        );
+      }
+    }
+  }
+
+  removeCaption(): void {
+    if (this.view) {
+      const imageNode = getNode(this.view, 'image');
+
+      if (imageNode) {
+        this.view.dispatch(
+          this.view.state.tr.setNodeMarkup(this.view.state.selection.from, null, {
+            ...imageNode.attrs,
+            alt: undefined,
+          }),
+        );
+      }
+    }
+  }
+
   insertYoutubeEmbed(url: string): boolean {
     if (this.view) {
       const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=))([a-zA-Z0-9_-]+)/);
@@ -548,7 +526,7 @@ export class ProseMirrorService implements OnDestroy {
       const videoId = match[1]; // 비디오 ID 추출
 
       const { state, dispatch } = this.view;
-      const { tr, schema, selection } = state;
+      const { tr, selection } = state;
       const { $from } = selection;
 
       const rootBlockPos = $from.start(1);
@@ -574,7 +552,7 @@ export class ProseMirrorService implements OnDestroy {
     return false;
   }
 
-  insertImageFile(view: EditorView, file: File): void {
+  async insertImageFile(view: EditorView, file: File): Promise<void> {
     const { state, dispatch } = view;
     const { tr, schema, selection } = state;
     const { $from } = selection;
@@ -585,10 +563,12 @@ export class ProseMirrorService implements OnDestroy {
     // rootBlockNode가 있을 때 nodeSize에서 1을 뺴는 이유는 1을 빼지 않으면 노드 바깥을 선택하기 때문
     const rootBlockEndPos = rootBlockNode ? rootBlockPos + rootBlockNode.nodeSize - 1 : rootBlockPos;
 
+    const objectUrl = await fileToBase64(file);
+
     let transaction = tr.insert(
       rootBlockEndPos,
       schema.nodes['image'].create({
-        src: URL.createObjectURL(file),
+        src: objectUrl,
       }),
     );
 
@@ -596,10 +576,179 @@ export class ProseMirrorService implements OnDestroy {
 
     dispatch(transaction);
 
-    this.files.push(file);
+    this.files.push({
+      originalFile: file,
+      objectUrl,
+    });
   }
 
-  getJson(): any | undefined {
+  removeNode(view: EditorView): void {
+    const { state, dispatch } = view;
+
+    const { selection } = state;
+
+    if (selection instanceof TextSelection) {
+      // 현재 선택된 영역을 기준으로 부모 노드를 찾습니다.
+      const parentNode = selection.$from.node(selection.$from.depth - 1);
+
+      // 선택이 텍스트나 범위에 있으면 작업을 진행합니다.
+      if (parentNode) {
+        // 부모 노드를 삭제하려면 lift 명령어를 사용할 수 있습니다.
+        const tr = state.tr;
+
+        // 선택된 노드를 삭제하는 트랜잭션을 생성합니다.
+        tr.delete(selection.from, selection.to);
+
+        // 트랜잭션을 dispatch하여 상태를 업데이트합니다.
+        if (dispatch) {
+          dispatch(tr);
+        }
+      }
+    } else if (selection instanceof NodeSelection) {
+      let transaction = state.tr.delete(selection.from, selection.to);
+
+      const nearSelection = TextSelection.near(transaction.selection.$from);
+
+      const newSelection = TextSelection.create(transaction.doc, nearSelection.from);
+
+      transaction = transaction.setSelection(newSelection);
+
+      dispatch(transaction);
+    }
+  }
+
+  /** 제공된 objectUrl을 가진 파일 제거 */
+  removeFileByObjectUrl(objectUrl: string): void {
+    this.files = this.files.filter((_file) => {
+      return _file.objectUrl !== objectUrl;
+    });
+  }
+
+  scrollToCenter(): void {
+    const view = this.view;
+
+    if (view) {
+      const { from } = view.state.selection;
+
+      let dom: Node | HTMLElement | null = view.domAtPos(from).node;
+
+      if (dom instanceof Text) {
+        // TextNode일 경우 상위 부모 Element 선택
+        dom = dom.parentElement;
+      } else if (dom === this.view?.dom) {
+        // 해당 포지션에 editable 요소가 없기 때문에, offset을 이용해 노드를 조회
+        dom = this.view.dom.childNodes.item(view.domAtPos(from).offset);
+      }
+
+      if (
+        dom instanceof HTMLElement &&
+        (dom.getBoundingClientRect().top < 110 || dom.getBoundingClientRect().bottom > window.innerHeight - 60)
+      ) {
+        dom.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'center',
+        });
+      }
+    }
+  }
+
+  getJson(): ProseMirrorNodeJson | undefined {
     return this.view?.state.doc.toJSON();
+  }
+
+  setJson(json: ProseMirrorNodeJson): void {
+    const doc = ProseMirrorNode.fromJSON(this._schema, json);
+
+    if (this.view) {
+      this.view.dispatch(this.view.state.tr.replaceWith(0, this.view.state.doc.content.size, doc.content));
+    }
+  }
+
+  setHtmlString(html: string): void {
+    const view = this.view;
+
+    if (view) {
+      const div = this._document.createElement('div');
+
+      div.innerHTML = html;
+
+      const node = DOMParser.fromSchema(this._schema).parse(div);
+
+      view.dispatch(view.state.tr.replaceWith(0, view.state.doc.content.size, node.content.content));
+
+      div.remove();
+    }
+  }
+
+  setMarkdown(markdown: string): void {
+    const html = this._markdownService.render(markdown);
+
+    const div = this._document.createElement('div');
+
+    div.innerHTML = html;
+
+    // 이미지 paragraph 태그에서 추출
+    div.querySelectorAll('img').forEach((img) => {
+      const parentElement = img.parentElement;
+
+      if (parentElement) {
+        div.insertBefore(img, parentElement);
+      }
+    });
+
+    this.setHtmlString(div.innerHTML);
+  }
+
+  private _removeMarkBySpace(view: EditorView, name: string, event: KeyboardEvent): boolean {
+    const { state, dispatch } = view;
+    const { selection } = state;
+    const { $from, $to } = selection;
+
+    // inline code에서 처음, 끝 공백 입력 시 code 벗어나는 코드
+    // inline code 마크가 있는 경우
+    let position: number | undefined;
+
+    // mark의 시작 오프셋
+    let startOffset: number | undefined;
+
+    // mark의 끝 오프셋
+    let endOffset: number | undefined;
+
+    const mark = getMark(view, name);
+
+    const parent = $from.parent;
+
+    parent.forEach((node, offset) => {
+      if (node.marks.some((_mark) => _mark === mark)) {
+        // 현재 마크 범위의 시작과 끝 계산
+        startOffset = $from.start() + offset;
+        endOffset = startOffset + node.nodeSize;
+      }
+    });
+
+    if (startOffset === $from.pos) {
+      // 커서가 마크의 시작점에 있는 경우 커서 이전에 공백 추가
+      position = $from.pos - 1;
+    } else if (endOffset === $from.pos) {
+      // 커서가 마크의 끝점에 있는 경우 커서 다음에 공백 추가
+      position = $to.pos + 1;
+    }
+
+    if (position !== undefined) {
+      event.preventDefault();
+
+      const textNode = state.schema.text(' ');
+
+      let transaction = state.tr.replaceSelectionWith(textNode, false);
+
+      transaction = transaction.setSelection(TextSelection.create(transaction.doc, position));
+
+      dispatch(transaction);
+
+      return true;
+    }
+
+    return false;
   }
 }
