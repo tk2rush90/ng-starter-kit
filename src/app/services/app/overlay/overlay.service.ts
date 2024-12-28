@@ -231,12 +231,6 @@ export class OverlayService implements OnDestroy {
       ready: false,
       close: () => {
         this.close(overlayRef);
-
-        // `parentOverlayRef`이 제공될 경우 원래 상태로 복원
-        if (options.parentOverlayRef) {
-          options.parentOverlayRef.outsideClosingPrevented = options.parentOverlayRef.initialOutsideClosingPrevented;
-          options.parentOverlayRef.keyboardClosingPrevented = options.parentOverlayRef.initialKeyboardClosingPrevented;
-        }
       },
     };
 
@@ -263,6 +257,12 @@ export class OverlayService implements OnDestroy {
 
       if (options?.onDestroy) {
         options.onDestroy();
+      }
+
+      // `parentOverlayRef`이 제공될 경우 원래 상태로 복원
+      if (options.parentOverlayRef) {
+        options.parentOverlayRef.outsideClosingPrevented = options.parentOverlayRef.initialOutsideClosingPrevented;
+        options.parentOverlayRef.keyboardClosingPrevented = options.parentOverlayRef.initialKeyboardClosingPrevented;
       }
     });
 
