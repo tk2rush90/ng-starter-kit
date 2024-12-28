@@ -8,16 +8,15 @@ import { Location } from '@angular/common';
 import { Platform } from '../../../utils/platform';
 
 @Component({
-  selector: 'app-google-oauth-button',
-  standalone: true,
-  imports: [IconGoogleLogoComponent],
-  templateUrl: './google-oauth-button.component.html',
-  styleUrl: './google-oauth-button.component.scss',
-  host: {
-    class: 'stroke-button gap-2',
-    type: 'button',
-    role: 'button',
-  },
+    selector: 'app-google-oauth-button',
+    imports: [IconGoogleLogoComponent],
+    templateUrl: './google-oauth-button.component.html',
+    styleUrl: './google-oauth-button.component.scss',
+    host: {
+        class: 'stroke-button gap-2',
+        type: 'button',
+        role: 'button',
+    }
 })
 export class GoogleOauthButtonComponent {
   constructor(

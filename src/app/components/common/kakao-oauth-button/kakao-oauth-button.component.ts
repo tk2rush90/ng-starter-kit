@@ -8,16 +8,15 @@ import { environment } from '../../../../environments/environment';
 import { Platform } from '../../../utils/platform';
 
 @Component({
-  selector: 'app-kakao-oauth-button',
-  standalone: true,
-  imports: [IconKakaoComponent],
-  templateUrl: './kakao-oauth-button.component.html',
-  styleUrl: './kakao-oauth-button.component.scss',
-  host: {
-    class: 'flat-button gap-2 kakao',
-    type: 'button',
-    role: 'button',
-  },
+    selector: 'app-kakao-oauth-button',
+    imports: [IconKakaoComponent],
+    templateUrl: './kakao-oauth-button.component.html',
+    styleUrl: './kakao-oauth-button.component.scss',
+    host: {
+        class: 'flat-button gap-2 kakao',
+        type: 'button',
+        role: 'button',
+    }
 })
 export class KakaoOauthButtonComponent {
   constructor(

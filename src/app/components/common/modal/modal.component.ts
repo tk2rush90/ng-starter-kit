@@ -8,20 +8,18 @@ import { OVERLAY_REF } from '../../../tokens/overlay-ref';
 
 /** A modal container */
 @Component({
-  selector: 'app-modal',
-  standalone: true,
-  imports: [IconButtonDirective, IconXMarkComponent],
-  templateUrl: './modal.component.html',
-  styleUrl: './modal.component.scss',
-  host: {
-    'class':
-      'fixed bg-white rounded-2xl p-6 flex-col-stretch gap-5 shadow-lg top-1/2 left-1/2 pointer-events-auto max-h-[calc(100vh-32px)] overflow-auto w-[calc(100%-32px)]',
-    // To bind `transform` animation or TailwindCSS classes, use `translate` attribute.
-    '[style.translate]': `'-50% -50%'`,
-    '[@modalFadeInOut]': '',
-    '[@modalScaleUpDown]': '',
-  },
-  animations: [fadeInOut('modalFadeInOut'), scaleUpDown('modalScaleUpDown')],
+    selector: 'app-modal',
+    imports: [IconButtonDirective, IconXMarkComponent],
+    templateUrl: './modal.component.html',
+    styleUrl: './modal.component.scss',
+    host: {
+        'class': 'fixed bg-white rounded-2xl p-6 flex-col-stretch gap-5 shadow-lg top-1/2 left-1/2 pointer-events-auto max-h-[calc(100vh-32px)] overflow-auto w-[calc(100%-32px)]',
+        // To bind `transform` animation or TailwindCSS classes, use `translate` attribute.
+        '[style.translate]': `'-50% -50%'`,
+        '[@modalFadeInOut]': '',
+        '[@modalScaleUpDown]': '',
+    },
+    animations: [fadeInOut('modalFadeInOut'), scaleUpDown('modalScaleUpDown')]
 })
 export class ModalComponent {
   /** Set modal title */

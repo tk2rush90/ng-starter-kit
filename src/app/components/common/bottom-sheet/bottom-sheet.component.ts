@@ -9,20 +9,18 @@ import { OVERLAY_REF } from '../../../tokens/overlay-ref';
 
 /** An overlay that appears from the bottom */
 @Component({
-  selector: 'app-bottom-sheet',
-  standalone: true,
-  imports: [IconArrowLeftComponent, IconButtonDirective, IconXMarkComponent],
-  templateUrl: './bottom-sheet.component.html',
-  styleUrl: './bottom-sheet.component.scss',
-  animations: [fadeInOut('bottomSheetFadeInOut'), slideInOutBottom('bottomSheetSlideInOutBottom')],
-  host: {
-    'class':
-      'fixed bg-white rounded-2xl py-6 px-8 gap-4 flex-col-stretch shadow-lg bottom-4 left-1/2 pointer-events-auto max-h-[calc(100vh-32px)] overflow-auto w-[calc(100%-32px)]',
-    // To bind `transform` animation or TailwindCSS classes, use `translate` attribute.
-    '[style.translate]': `'-50% 0'`,
-    '[@bottomSheetFadeInOut]': '',
-    '[@bottomSheetSlideInOutBottom]': '',
-  },
+    selector: 'app-bottom-sheet',
+    imports: [IconArrowLeftComponent, IconButtonDirective, IconXMarkComponent],
+    templateUrl: './bottom-sheet.component.html',
+    styleUrl: './bottom-sheet.component.scss',
+    animations: [fadeInOut('bottomSheetFadeInOut'), slideInOutBottom('bottomSheetSlideInOutBottom')],
+    host: {
+        'class': 'fixed bg-white rounded-2xl py-6 px-8 gap-4 flex-col-stretch shadow-lg bottom-4 left-1/2 pointer-events-auto max-h-[calc(100vh-32px)] overflow-auto w-[calc(100%-32px)]',
+        // To bind `transform` animation or TailwindCSS classes, use `translate` attribute.
+        '[style.translate]': `'-50% 0'`,
+        '[@bottomSheetFadeInOut]': '',
+        '[@bottomSheetSlideInOutBottom]': '',
+    }
 })
 export class BottomSheetComponent {
   /** Set sheet title */

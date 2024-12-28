@@ -4,15 +4,14 @@ import { fadeInOut } from '../../../../../animations/fade-in-out';
 
 /** A button that displays selected status */
 @Component({
-  selector: 'app-radio-button',
-  standalone: true,
-  imports: [],
-  templateUrl: './radio-button.component.html',
-  styleUrl: './radio-button.component.scss',
-  host: {
-    class: 'flex-center w-5 h-5 rounded-full border transition-colors relative',
-  },
-  animations: [fadeInOut('radioButtonFadeInOut')],
+    selector: 'app-radio-button',
+    imports: [],
+    templateUrl: './radio-button.component.html',
+    styleUrl: './radio-button.component.scss',
+    host: {
+        class: 'flex-center w-5 h-5 rounded-full border transition-colors relative',
+    },
+    animations: [fadeInOut('radioButtonFadeInOut')]
 })
 export class RadioButtonComponent {
   /** Internal selected status to show and hide selected icon */

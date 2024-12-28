@@ -23,33 +23,32 @@ import { OverlayService } from '../../../services/app/overlay/overlay.service';
 import { WysiwygYoutubeEmbedComponent } from '../wysiwyg-youtube-embed/wysiwyg-youtube-embed.component';
 
 @Component({
-  selector: 'app-wysiwyg-editor',
-  standalone: true,
-  imports: [
-    IconBoldComponent,
-    IconItalicComponent,
-    IconUnderlineComponent,
-    IconStrikeThroughComponent,
-    IconTextComponent,
-    IconTextQuoteComponent,
-    IconHeading1Component,
-    IconHeading2Component,
-    IconHeading3Component,
-    WysiwygEditorButtonComponent,
-    IconBracesComponent,
-    IconCodeComponent,
-    IconYoutubeComponent,
-    IconImageComponent,
-    FileUploaderDirective,
-    BackdropComponent,
-    ModalComponent,
-    WysiwygYoutubeEmbedComponent,
-  ],
-  templateUrl: './wysiwyg-editor.component.html',
-  styleUrl: './wysiwyg-editor.component.scss',
-  host: {
-    class: 'flex-col-stretch',
-  },
+    selector: 'app-wysiwyg-editor',
+    imports: [
+        IconBoldComponent,
+        IconItalicComponent,
+        IconUnderlineComponent,
+        IconStrikeThroughComponent,
+        IconTextComponent,
+        IconTextQuoteComponent,
+        IconHeading1Component,
+        IconHeading2Component,
+        IconHeading3Component,
+        WysiwygEditorButtonComponent,
+        IconBracesComponent,
+        IconCodeComponent,
+        IconYoutubeComponent,
+        IconImageComponent,
+        FileUploaderDirective,
+        BackdropComponent,
+        ModalComponent,
+        WysiwygYoutubeEmbedComponent,
+    ],
+    templateUrl: './wysiwyg-editor.component.html',
+    styleUrl: './wysiwyg-editor.component.scss',
+    host: {
+        class: 'flex-col-stretch',
+    }
 })
 export class WysiwygEditorComponent implements AfterViewInit {
   @Input() placeholder = '';

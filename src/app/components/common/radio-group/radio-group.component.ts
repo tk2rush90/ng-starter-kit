@@ -17,15 +17,14 @@ import { QueryListUtil } from '../../../utils/query-list-util';
 
 /** Radio group allows selecting an option between multiple options */
 @Component({
-  selector: 'app-radio-group',
-  standalone: true,
-  imports: [],
-  templateUrl: './radio-group.component.html',
-  styleUrl: './radio-group.component.scss',
-  host: {
-    tabindex: '0',
-  },
-  providers: [RadioGroupService],
+    selector: 'app-radio-group',
+    imports: [],
+    templateUrl: './radio-group.component.html',
+    styleUrl: './radio-group.component.scss',
+    host: {
+        tabindex: '0',
+    },
+    providers: [RadioGroupService]
 })
 export class RadioGroupComponent extends AppControlValueAccessor {
   /** Emits when value has changed */

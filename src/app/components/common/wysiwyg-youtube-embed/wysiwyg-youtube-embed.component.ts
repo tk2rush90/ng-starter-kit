@@ -6,11 +6,10 @@ import { FormFieldComponent } from '../form-field/form-field.component';
 import { FieldErrorComponent } from '../form-field/field-error/field-error.component';
 
 @Component({
-  selector: 'app-wysiwyg-youtube-embed',
-  standalone: true,
-  imports: [ReactiveFormsModule, FormFieldComponent, FieldErrorComponent],
-  templateUrl: './wysiwyg-youtube-embed.component.html',
-  styleUrl: './wysiwyg-youtube-embed.component.scss',
+    selector: 'app-wysiwyg-youtube-embed',
+    imports: [ReactiveFormsModule, FormFieldComponent, FieldErrorComponent],
+    templateUrl: './wysiwyg-youtube-embed.component.html',
+    styleUrl: './wysiwyg-youtube-embed.component.scss'
 })
 export class WysiwygYoutubeEmbedComponent {
   @Output() submitted = new EventEmitter<string>();

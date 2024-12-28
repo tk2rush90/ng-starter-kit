@@ -11,19 +11,18 @@ import { CheckboxService } from '../../../services/app/checkbox/checkbox.service
 
 /** A component of checkbox with label and button */
 @Component({
-  selector: 'app-checkbox',
-  standalone: true,
-  imports: [],
-  templateUrl: './checkbox.component.html',
-  styleUrl: './checkbox.component.scss',
-  host: {
-    tabindex: '0',
-    class: 'cursor-pointer select-none',
-    role: 'checkbox',
-    ['[attr.aria-checked]']: 'checked',
-    ['[class.headwind-checked]']: 'checked',
-  },
-  providers: [CheckboxService],
+    selector: 'app-checkbox',
+    imports: [],
+    templateUrl: './checkbox.component.html',
+    styleUrl: './checkbox.component.scss',
+    host: {
+        tabindex: '0',
+        class: 'cursor-pointer select-none',
+        role: 'checkbox',
+        ['[attr.aria-checked]']: 'checked',
+        ['[class.headwind-checked]']: 'checked',
+    },
+    providers: [CheckboxService]
 })
 export class CheckboxComponent extends AppControlValueAccessor {
   /** Emits when `checked` status has changed */

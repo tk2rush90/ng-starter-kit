@@ -22,14 +22,13 @@ import { IconAsteriskComponent } from '../../icons/icon-asterisk/icon-asterisk.c
 
 /** A component to create form field */
 @Component({
-  selector: 'app-form-field',
-  standalone: true,
-  imports: [IconXMarkComponent, IconChevronDownComponent, IconAsteriskComponent],
-  templateUrl: './form-field.component.html',
-  styleUrl: './form-field.component.scss',
-  host: {
-    class: 'app-form-field flex-col-stretch gap-1',
-  },
+    selector: 'app-form-field',
+    imports: [IconXMarkComponent, IconChevronDownComponent, IconAsteriskComponent],
+    templateUrl: './form-field.component.html',
+    styleUrl: './form-field.component.scss',
+    host: {
+        class: 'app-form-field flex-col-stretch gap-1',
+    }
 })
 export class FormFieldComponent implements AfterContentInit, OnDestroy {
   @Input({ transform: booleanAttribute }) required = false;

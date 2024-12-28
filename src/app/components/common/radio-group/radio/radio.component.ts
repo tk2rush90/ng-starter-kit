@@ -12,14 +12,13 @@ import { RadioButtonComponent } from './radio-button/radio-button.component';
 
 /** A component which can be used as an option for `RadioGroupComponent` */
 @Component({
-  selector: 'app-radio',
-  standalone: true,
-  imports: [],
-  templateUrl: './radio.component.html',
-  styleUrl: './radio.component.scss',
-  host: {
-    class: 'cursor-pointer select-none',
-  },
+    selector: 'app-radio',
+    imports: [],
+    templateUrl: './radio.component.html',
+    styleUrl: './radio.component.scss',
+    host: {
+        class: 'cursor-pointer select-none',
+    }
 })
 export class RadioComponent implements AfterContentInit {
   /** Value of radio to apply when selected */

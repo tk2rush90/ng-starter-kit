@@ -5,15 +5,14 @@ import { fadeInOut } from '../../../../animations/fade-in-out';
 
 /** Checkbox button with checked status */
 @Component({
-  selector: 'app-checkbox-button',
-  standalone: true,
-  imports: [IconCheckComponent],
-  templateUrl: './checkbox-button.component.html',
-  styleUrl: './checkbox-button.component.scss',
-  host: {
-    class: 'flex-center rounded border w-5 h-5 transition-colors',
-  },
-  animations: [fadeInOut('checkboxButtonFadeInOut')],
+    selector: 'app-checkbox-button',
+    imports: [IconCheckComponent],
+    templateUrl: './checkbox-button.component.html',
+    styleUrl: './checkbox-button.component.scss',
+    host: {
+        class: 'flex-center rounded border w-5 h-5 transition-colors',
+    },
+    animations: [fadeInOut('checkboxButtonFadeInOut')]
 })
 export class CheckboxButtonComponent {
   constructor(private readonly _checkboxService: CheckboxService) {}
